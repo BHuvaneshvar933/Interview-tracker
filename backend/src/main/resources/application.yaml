@@ -1,0 +1,29 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  data:
+    mongodb:
+      # Set `MONGODB_URI` in your environment (local .env, system env, or deployment config)
+      uri: ${MONGODB_URI:mongodb://localhost:27017/jobtracker}
+      # If your URI does not include a database name, set this explicitly.
+      database: ${MONGODB_DATABASE:jobtracker}
+
+server:
+  port: ${PORT:5001}
+
+app:
+  jwt:
+    # REQUIRED: set `JWT_SECRET` in environment; do not commit real secrets
+    # Must be >= 32 chars for HS256.
+    secret: ${JWT_SECRET:PLEASE_SET_JWT_SECRET_CHANGE_ME_32CHARS_MINIMUM____}
+    expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+# AI Features (Gemini)
+# Required env vars:
+# - GEMINI_API_KEY
+# Optional:
+# - GEMINI_BASE_URL (default https://generativelanguage.googleapis.com/v1beta)
+# - GEMINI_MODEL (default gemini-2.5-flash)
+# - GEMINI_EMBEDDINGS_MODEL (default text-embedding-004)
