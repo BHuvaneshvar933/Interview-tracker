@@ -1,0 +1,15 @@
+# General
+.git
+.idea
+**/.DS_Store
+
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/dev-dist
+
+# Backend
+backend/target
+
+# Root target (if present)
+target
