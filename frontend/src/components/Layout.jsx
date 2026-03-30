@@ -151,7 +151,7 @@ function Layout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-auto">
+        <main className="flex-1 p-4 lg:p-8 overflow-auto overflow-x-hidden">
           {!online && (
             <div className="mb-4 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
               Offline mode: showing cached applications and interviews.

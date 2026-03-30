@@ -6,6 +6,16 @@
 @tailwind utilities;
 
 /* Base styles */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+}
+
 body {
   @apply bg-dark-900 text-white antialiased;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
