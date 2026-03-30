@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useLocation, useNavigate, Link } from "react-router-dom"
 import api from "../api/axios"
-import { setToken } from "../utils/auth"
+import { getToken, setToken } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 
 const BriefcaseIcon = () => (
@@ -36,6 +36,13 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const token = getToken()
+    if (!token) return
+    const to = location.state?.from || "/dashboard"
+    navigate(to, { replace: true })
+  }, [location.state, navigate])
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -138,6 +145,15 @@ function Login() {
               <p className="text-warning-300 text-sm text-center">
                 Offline: sign-in is disabled. You can still browse cached applications from the home screen if you already opened them before.
               </p>
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => navigate("/dashboard")}
+                  className="btn-secondary"
+                >
+                  Browse cached applications
+                </button>
+              </div>
             </div>
           )}
 
