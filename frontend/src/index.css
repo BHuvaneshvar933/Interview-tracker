@@ -39,6 +39,16 @@ body {
   @apply bg-dark-500;
 }
 
+/* Hide scrollbars for horizontal tab bars */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Custom utility classes */
 @layer components {
   /* Glass morphism card */
@@ -83,6 +93,15 @@ body {
            focus:outline-none focus:ring-2 focus:ring-danger-500/50 focus:ring-offset-2 focus:ring-offset-dark-900
            shadow-lg shadow-danger-500/25
            active:scale-[0.98];
+  }
+
+  @media (max-width: 640px) {
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 
   /* Input field */

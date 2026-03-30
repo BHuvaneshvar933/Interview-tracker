@@ -271,12 +271,12 @@ function ApplicationDetail() {
 
       {/* Tabs */}
       <div className="border-b border-dark-700">
-        <nav className="flex gap-1 overflow-x-auto pb-px">
+        <nav className="flex gap-1 overflow-x-auto pb-px scrollbar-hide">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
+              className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
                 activeTab === tab.id
                   ? "text-primary-400 border-primary-400"
                   : "text-dark-400 border-transparent hover:text-white hover:border-dark-600"
