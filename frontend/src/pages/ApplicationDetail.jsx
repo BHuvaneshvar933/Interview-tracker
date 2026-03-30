@@ -216,20 +216,24 @@ function ApplicationDetail() {
         </div>
       )}
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-        <div className="flex items-start gap-3 sm:gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 min-w-0">
+        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <button
             onClick={() => navigate("/dashboard")}
             className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-xl transition-all mt-1"
           >
             <ArrowLeftIcon />
           </button>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl lg:text-3xl font-bold text-white">{application.company}</h1>
-              <StatusBadge status={application.status} />
+          <div className="min-w-0">
+            <div className="flex items-center gap-3 mb-1 flex-wrap">
+              <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight break-words">
+                {application.company}
+              </h1>
+              <span className="shrink-0">
+                <StatusBadge status={application.status} />
+              </span>
             </div>
-            <p className="text-dark-400 text-lg">{application.role}</p>
+            <p className="text-dark-400 text-base sm:text-lg break-words">{application.role}</p>
             {application.location && (
               <p className="text-dark-500 text-sm mt-1">{application.location}</p>
             )}
@@ -371,9 +375,14 @@ function OverviewTab({ application }) {
         <h3 className="text-lg font-semibold text-white mb-4">Application Details</h3>
         <div className="space-y-4">
           {infoItems.map((item) => (
-            <div key={item.label} className="flex justify-between items-center py-2 border-b border-dark-700 last:border-0">
+            <div
+              key={item.label}
+              className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 py-2 border-b border-dark-700 last:border-0 min-w-0"
+            >
               <span className="text-dark-400">{item.label}</span>
-              <span className="text-white font-medium">{item.value}</span>
+              <span className="text-white font-medium break-words sm:text-right">
+                {item.value}
+              </span>
             </div>
           ))}
         </div>
@@ -570,7 +579,7 @@ function TimelineTab({ application }) {
                       <h4 className="text-white font-medium">{event.title}</h4>
                       <p className="text-dark-400 text-sm mt-1">{event.description}</p>
                     </div>
-                    <span className="text-dark-500 text-sm whitespace-nowrap">{event.date}</span>
+                    <span className="text-dark-500 text-sm whitespace-nowrap shrink-0">{event.date}</span>
                   </div>
                 </div>
               </div>
