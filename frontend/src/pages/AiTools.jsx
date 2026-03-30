@@ -148,7 +148,7 @@ function TabButton({ active, onClick, icon, children }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
+      className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
         active
           ? "text-primary-400 border-primary-400"
           : "text-dark-400 border-transparent hover:text-white hover:border-dark-600"
@@ -178,7 +178,7 @@ function FileDrop({ file, setFile, disabled }) {
         const f = e.dataTransfer.files?.[0]
         if (f) setFile(f)
       }}
-      className={`border-2 border-dashed rounded-2xl p-6 transition-all ${
+      className={`border-2 border-dashed rounded-2xl p-4 sm:p-6 transition-all ${
         disabled
           ? "border-dark-700 bg-dark-800/30 opacity-60"
           : dragOver
@@ -268,7 +268,7 @@ function ResumeMatcher({ online, onSavedResume }) {
           <textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            className="input-field min-h-[220px] resize-y"
+            className="input-field min-h-[140px] sm:min-h-[220px] resize-y"
             placeholder="Paste the job description here..."
             disabled={!online || loading}
           />
@@ -297,9 +297,9 @@ function ResumeMatcher({ online, onSavedResume }) {
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="card">
-          <h3 className="text-lg font-semibold text-white mb-4">Match Score</h3>
+       <div className="space-y-6 lg:sticky lg:top-6">
+         <div className="card">
+           <h3 className="text-lg font-semibold text-white mb-4">Match Score</h3>
           {scorePct == null ? (
             <EmptyPanel text="Run an analysis to see results." />
           ) : (
@@ -514,7 +514,7 @@ function QuestionGenerator({ online, resumesLoading, resumesError, resumes, onRe
           </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <button
             onClick={run}
             disabled={!online || loading}
@@ -641,7 +641,7 @@ function ResumeLibrary({ online, resumesLoading, resumesError, resumes, onRefres
           </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <button
             onClick={doUpload}
             disabled={!online || uploading}

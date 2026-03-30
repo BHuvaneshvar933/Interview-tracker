@@ -669,7 +669,7 @@ function Modal({ formData, handleChange, handleSubmit, close, formErrors, submit
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-dark-700">
             <button
               type="button"
               onClick={close}

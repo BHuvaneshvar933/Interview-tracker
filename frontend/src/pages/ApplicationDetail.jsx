@@ -216,8 +216,8 @@ function ApplicationDetail() {
         </div>
       )}
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <button
             onClick={() => navigate("/dashboard")}
             className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-xl transition-all mt-1"
@@ -235,33 +235,36 @@ function ApplicationDetail() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 justify-start lg:justify-end">
           {application.jobUrl && (
             <a
               href={application.jobUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary flex items-center gap-2"
+              className="btn-secondary flex items-center gap-2 w-full sm:w-auto justify-center"
             >
               <LinkIcon />
               <span className="hidden sm:inline">View Job</span>
+              <span className="sm:hidden">Job</span>
             </a>
           )}
           <button
             onClick={() => online && setIsEditing(true)}
             disabled={!online}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             <EditIcon />
             <span className="hidden sm:inline">Edit</span>
+            <span className="sm:hidden">Edit</span>
           </button>
           <button
             onClick={() => online && handleDelete()}
             disabled={!online}
-            className="btn-danger flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-danger flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             <TrashIcon />
             <span className="hidden sm:inline">Delete</span>
+            <span className="sm:hidden">Delete</span>
           </button>
         </div>
       </div>
@@ -773,7 +776,7 @@ function InterviewModal({ form, setForm, onSubmit, onClose, submitting }) {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-dark-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-dark-700">
             <button type="button" onClick={onClose} disabled={submitting} className="btn-secondary">
               Cancel
             </button>
