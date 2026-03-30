@@ -253,7 +253,7 @@ function Dashboard() {
             setShowModal(true)
           }}
           disabled={!online}
-          className="btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <PlusIcon />
           <span>New Application</span>
@@ -296,10 +296,10 @@ function Dashboard() {
           {/* Toggle advanced filters */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn-secondary flex items-center gap-2 ${showFilters ? 'bg-primary-500/20 border-primary-500/30' : ''}`}
+            className={`btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 ${showFilters ? 'bg-primary-500/20 border-primary-500/30' : ''}`}
           >
             <FilterIcon />
-            <span className="hidden sm:inline">Filters</span>
+            <span>Filters</span>
           </button>
         </div>
 
@@ -373,7 +373,11 @@ function Dashboard() {
               : "Start tracking your job applications"}
           </p>
           {!statusFilter && !filters.company && (
-            <button onClick={() => setShowModal(true)} className="btn-primary">
+            <button
+              onClick={() => online && setShowModal(true)}
+              disabled={!online}
+              className="btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Add your first application
             </button>
           )}
@@ -395,7 +399,7 @@ function Dashboard() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 overflow-x-auto scrollbar-hide py-1">
           <button
             disabled={page === 0}
             onClick={() => setPage(page - 1)}
@@ -454,10 +458,10 @@ function ApplicationCard({ app, index, onDelete, onClick, online }) {
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-white truncate group-hover:text-primary-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-semibold text-white truncate group-hover:text-primary-400 transition-colors">
             {app.company}
           </h3>
-          <p className="text-dark-400 truncate">{app.role}</p>
+          <p className="text-sm sm:text-base text-dark-400 truncate">{app.role}</p>
         </div>
         <StatusBadge status={app.status} />
       </div>
