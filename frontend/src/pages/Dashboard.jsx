@@ -4,6 +4,7 @@ import { deleteApplication } from "../api/deleteApplication"
 import { useNavigate } from "react-router-dom"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { listApplications } from "../repo/applicationsRepo"
+import { getToken } from "../utils/auth"
 
 // Icons
 const PlusIcon = () => (
@@ -95,6 +96,7 @@ function Dashboard() {
 
   const navigate = useNavigate()
   const online = useOnlineStatus()
+  const token = getToken()
 
   const [formData, setFormData] = useState({
     company: "",
@@ -226,6 +228,11 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {!token && !online && (
+        <div className="mb-2 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
+          Offline read-only mode. Some actions are disabled until you sign in again.
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

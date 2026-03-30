@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import api from "../api/axios"
+import { useOnlineStatus } from "../hooks/useOnlineStatus"
 
 const BriefcaseIcon = () => (
   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,6 +36,7 @@ const LoadingSpinner = () => (
 
 function Register() {
   const navigate = useNavigate()
+  const online = useOnlineStatus()
   const [form, setForm] = useState({ email: "", password: "", confirmPassword: "" })
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -47,6 +49,11 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (!online) {
+      setError("You're offline. Connect to the internet to create an account.")
+      return
+    }
     
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match")
@@ -162,6 +169,14 @@ function Register() {
             </div>
           )}
 
+          {!online && (
+            <div className="mb-6 p-4 bg-warning-500/10 border border-warning-500/30 rounded-xl animate-fade-in-down">
+              <p className="text-warning-300 text-sm text-center">
+                Offline: registration is disabled.
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-dark-300">
@@ -229,7 +244,7 @@ function Register() {
 
             <button
               type="submit"
-              disabled={loading || message}
+              disabled={loading || message || !online}
               className="btn-primary w-full flex items-center justify-center gap-2 py-3"
             >
               {loading ? (

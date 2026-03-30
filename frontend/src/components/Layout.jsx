@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { logout } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
+import { getToken } from "../utils/auth"
 
 // Icons as simple SVG components
 const DashboardIcon = () => (
@@ -51,6 +52,7 @@ function Layout({ children }) {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const online = useOnlineStatus()
+  const token = getToken()
 
   const handleLogout = () => {
     logout()
@@ -153,6 +155,7 @@ function Layout({ children }) {
           {!online && (
             <div className="mb-4 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
               Offline mode: showing cached applications and interviews.
+              {!token && " (Read-only until you sign in again.)"}
             </div>
           )}
           <div className="animate-fade-in">

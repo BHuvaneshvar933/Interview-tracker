@@ -5,6 +5,7 @@ import { updateApplication } from "../api/updateApplication.js"
 import { addInterview } from "../api/addInterview"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getApplication } from "../repo/applicationsRepo"
+import { getToken } from "../utils/auth"
 
 // Icons
 const ArrowLeftIcon = () => (
@@ -90,6 +91,7 @@ function ApplicationDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const online = useOnlineStatus()
+  const token = getToken()
 
   const [application, setApplication] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -200,6 +202,11 @@ function ApplicationDetail() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {!token && !online && (
+        <div className="px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
+          Offline read-only mode. Editing and deleting require internet + sign-in.
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">

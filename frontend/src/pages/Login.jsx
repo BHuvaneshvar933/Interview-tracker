@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { useLocation, useNavigate, Link } from "react-router-dom"
 import api from "../api/axios"
 import { setToken } from "../utils/auth"
+import { useOnlineStatus } from "../hooks/useOnlineStatus"
 
 const BriefcaseIcon = () => (
   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,6 +31,8 @@ const LoadingSpinner = () => (
 
 function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const online = useOnlineStatus()
   const [form, setForm] = useState({ email: "", password: "" })
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -41,13 +44,18 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!online) {
+      setError("You're offline. Connect to the internet to sign in.")
+      return
+    }
     setLoading(true)
     setError("")
 
     try {
       const res = await api.post("/api/auth/login", form)
       setToken(res.data.token)
-      navigate("/dashboard")
+      const to = location.state?.from || "/dashboard"
+      navigate(to)
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password")
     } finally {
@@ -125,6 +133,14 @@ function Login() {
             </div>
           )}
 
+          {!online && (
+            <div className="mb-6 p-4 bg-warning-500/10 border border-warning-500/30 rounded-xl animate-fade-in-down">
+              <p className="text-warning-300 text-sm text-center">
+                Offline: sign-in is disabled. You can still browse cached applications from the home screen if you already opened them before.
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-dark-300">
@@ -170,7 +186,7 @@ function Login() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !online}
               className="btn-primary w-full flex items-center justify-center gap-2 py-3"
             >
               {loading ? (
