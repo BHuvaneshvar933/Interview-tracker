@@ -133,6 +133,14 @@ function ApplicationDetail() {
     loadApplication()
   }, [id])
 
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") loadApplication()
+    }
+    document.addEventListener("visibilitychange", onVisibility)
+    return () => document.removeEventListener("visibilitychange", onVisibility)
+  }, [id])
+
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this application?")) return
     try {

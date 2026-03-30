@@ -2,6 +2,9 @@ import axios from "axios"
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5001",
+  // Important for offline UX: without a timeout, requests can hang indefinitely
+  // when the device reports "online" but has no actual connectivity.
+  timeout: 8000,
 })
 
 api.interceptors.request.use((config) => {

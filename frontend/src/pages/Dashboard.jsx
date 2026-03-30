@@ -136,6 +136,14 @@ function Dashboard() {
     return () => clearTimeout(delay)
   }, [page, statusFilter, filters])
 
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") loadApplications()
+    }
+    document.addEventListener("visibilitychange", onVisibility)
+    return () => document.removeEventListener("visibilitychange", onVisibility)
+  }, [page, statusFilter, filters])
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
