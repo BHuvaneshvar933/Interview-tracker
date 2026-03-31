@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
+import { toUserMessage } from "../utils/errorMessage"
 
 import {
   analyzeResume,
@@ -71,7 +72,7 @@ export default function AiTools() {
       const res = await listResumes()
       setResumes(res.data || [])
     } catch (e) {
-      setResumesError("Failed to load resumes")
+      setResumesError(toUserMessage(e, "Failed to load resumes"))
     } finally {
       setResumesLoading(false)
     }
@@ -244,7 +245,7 @@ function ResumeMatcher({ online, onSavedResume }) {
       setResult(res.data)
       onSavedResume?.()
     } catch (e) {
-      setError(e.response?.data?.message || "Failed to analyze resume")
+      setError(toUserMessage(e, "Failed to analyze resume"))
     } finally {
       setLoading(false)
     }
@@ -277,6 +278,26 @@ function ResumeMatcher({ online, onSavedResume }) {
         {error && (
           <div className="p-4 bg-danger-500/10 border border-danger-500/30 rounded-xl">
             <p className="text-danger-400 text-sm">{error}</p>
+            <div className="mt-3 flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={run}
+                disabled={!online || loading}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Try again
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setError("")
+                  setResult(null)
+                }}
+                className="btn-ghost"
+              >
+                Dismiss
+              </button>
+            </div>
           </div>
         )}
 
@@ -426,7 +447,7 @@ function QuestionGenerator({ online, resumesLoading, resumesError, resumes, onRe
       const res = await generateQuestions({ company, role, resumeId, difficulty })
       setData(res.data)
     } catch (e) {
-      setError(e.response?.data?.message || "Failed to generate questions")
+      setError(toUserMessage(e, "Failed to generate questions"))
     } finally {
       setLoading(false)
     }
@@ -511,6 +532,19 @@ function QuestionGenerator({ online, resumesLoading, resumesError, resumes, onRe
         {error && (
           <div className="p-4 bg-danger-500/10 border border-danger-500/30 rounded-xl">
             <p className="text-danger-400 text-sm">{error}</p>
+            <div className="mt-3 flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={run}
+                disabled={!online || loading}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Try again
+              </button>
+              <button type="button" onClick={() => setError("")} className="btn-ghost">
+                Dismiss
+              </button>
+            </div>
           </div>
         )}
 
@@ -619,7 +653,7 @@ function ResumeLibrary({ online, resumesLoading, resumesError, resumes, onRefres
       setFile(null)
       await onRefreshResumes()
     } catch (e) {
-      setError(e.response?.data?.message || "Upload failed")
+      setError(toUserMessage(e, "Upload failed"))
     } finally {
       setUploading(false)
     }
@@ -638,6 +672,19 @@ function ResumeLibrary({ online, resumesLoading, resumesError, resumes, onRefres
         {error && (
           <div className="p-4 bg-danger-500/10 border border-danger-500/30 rounded-xl">
             <p className="text-danger-400 text-sm">{error}</p>
+            <div className="mt-3 flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onClick={doUpload}
+                disabled={!online || uploading}
+                className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Try again
+              </button>
+              <button type="button" onClick={() => setError("")} className="btn-ghost">
+                Dismiss
+              </button>
+            </div>
           </div>
         )}
 
