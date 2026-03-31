@@ -216,7 +216,7 @@ function ApplicationDetail() {
         </div>
       )}
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 min-w-0">
+     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 w-full overflow-hidden">
         <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <button
             onClick={() => navigate("/dashboard")}
@@ -239,13 +239,13 @@ function ApplicationDetail() {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 justify-start lg:justify-end">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 sm:justify-end w-full lg:w-auto shrink-0">
           {application.jobUrl && (
             <a
               href={application.jobUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary flex items-center gap-2 w-full sm:w-auto justify-center"
+              className="btn-secondary flex items-center justify-center gap-2"
             >
               <LinkIcon />
               <span className="hidden sm:inline">View Job</span>
@@ -255,7 +255,7 @@ function ApplicationDetail() {
           <button
             onClick={() => online && setIsEditing(true)}
             disabled={!online}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
+            className="btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <EditIcon />
             <span className="hidden sm:inline">Edit</span>
@@ -264,7 +264,7 @@ function ApplicationDetail() {
           <button
             onClick={() => online && handleDelete()}
             disabled={!online}
-            className="btn-danger flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
+            className="btn-danger flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <TrashIcon />
             <span className="hidden sm:inline">Delete</span>
@@ -274,7 +274,7 @@ function ApplicationDetail() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-dark-700">
+      <div className="border-b border-dark-700 overflow-hidden">
         <nav className="flex gap-1 overflow-x-auto pb-px scrollbar-hide">
           {tabs.map((tab) => (
             <button

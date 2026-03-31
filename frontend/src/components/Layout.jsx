@@ -130,7 +130,7 @@ function Layout({ children }) {
       </aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
         {/* Mobile header */}
         <header className="lg:hidden sticky top-0 z-30 bg-dark-800/80 backdrop-blur-xl border-b border-dark-700/50">
           <div className="flex items-center justify-between p-4">
@@ -151,7 +151,7 @@ function Layout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-auto overflow-x-hidden">
+        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden">
           {!online && (
             <div className="mb-4 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
               Offline mode: showing cached applications and interviews.
