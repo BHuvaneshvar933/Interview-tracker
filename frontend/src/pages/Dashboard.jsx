@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { listApplications } from "../repo/applicationsRepo"
 import { getToken } from "../utils/auth"
+import Toast from "../components/Toast"
+import ConfirmDialog from "../components/ConfirmDialog"
 
 // Icons
 const PlusIcon = () => (
@@ -78,6 +80,8 @@ function Dashboard() {
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
+  const [confirm, setConfirm] = useState({ open: false, id: null })
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [statusFilter, setStatusFilter] = useState("")
@@ -194,7 +198,7 @@ function Dashboard() {
       setPage(0)
       loadApplications()
     } catch (err) {
-      alert("Failed to create application")
+      setToast({ open: true, message: "Could not create application. Please try again.", tone: "error" })
     } finally {
       setSubmitting(false)
     }
@@ -202,13 +206,20 @@ function Dashboard() {
 
   const handleDelete = async (id, e) => {
     e.stopPropagation()
-    if (!window.confirm("Delete this application?")) return
+    setConfirm({ open: true, id })
+  }
+
+  const confirmDelete = async () => {
+    const id = confirm.id
+    setConfirm({ open: false, id: null })
+    if (!id) return
 
     try {
       await deleteApplication(id)
+      setToast({ open: true, message: "Application deleted.", tone: "success" })
       loadApplications()
-    } catch (err) {
-      alert("Failed to delete")
+    } catch {
+      setToast({ open: true, message: "Could not delete application. Please try again.", tone: "error" })
     }
   }
 
@@ -236,6 +247,24 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        tone={toast.tone}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      />
+
+      <ConfirmDialog
+        open={confirm.open}
+        title="Delete application?"
+        message="This will permanently remove it."
+        confirmText="Delete"
+        cancelText="Cancel"
+        tone="danger"
+        onCancel={() => setConfirm({ open: false, id: null })}
+        onConfirm={confirmDelete}
+      />
+
       {!token && !online && (
         <div className="mb-2 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
           Offline read-only mode. Some actions are disabled until you sign in again.
@@ -673,7 +702,7 @@ function Modal({ formData, handleChange, handleSubmit, close, formErrors, submit
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-dark-700">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 border-t border-dark-700">
             <button
               type="button"
               onClick={close}
@@ -686,7 +715,7 @@ function Modal({ formData, handleChange, handleSubmit, close, formErrors, submit
             <button
               type="submit"
               disabled={submitting}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>

@@ -6,6 +6,8 @@ import { addInterview } from "../api/addInterview"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getApplication } from "../repo/applicationsRepo"
 import { getToken } from "../utils/auth"
+import Toast from "../components/Toast"
+import ConfirmDialog from "../components/ConfirmDialog"
 
 // Icons
 const ArrowLeftIcon = () => (
@@ -100,6 +102,8 @@ function ApplicationDetail() {
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(null)
   const [showInterviewModal, setShowInterviewModal] = useState(false)
+  const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [interviewSubmitting, setInterviewSubmitting] = useState(false)
   const [interviewForm, setInterviewForm] = useState({
     roundName: "",
@@ -142,12 +146,17 @@ function ApplicationDetail() {
   }, [id])
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this application?")) return
+    setConfirmDeleteOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    setConfirmDeleteOpen(false)
     try {
       await deleteApplication(id)
+      setToast({ open: true, message: "Application deleted.", tone: "success" })
       navigate("/dashboard")
-    } catch (err) {
-      alert("Failed to delete application")
+    } catch {
+      setToast({ open: true, message: "Could not delete application. Please try again.", tone: "error" })
     }
   }
 
@@ -159,8 +168,9 @@ function ApplicationDetail() {
       await updateApplication(id, payload)
       setIsEditing(false)
       await loadApplication()
+      setToast({ open: true, message: "Application updated.", tone: "success" })
     } catch (err) {
-      alert("Failed to update application")
+      setToast({ open: true, message: "Could not update application. Please try again.", tone: "error" })
     }
   }
 
@@ -172,8 +182,9 @@ function ApplicationDetail() {
       setShowInterviewModal(false)
       setInterviewForm({ roundName: "", interviewDate: "", result: "PENDING", notes: "" })
       await loadApplication()
+      setToast({ open: true, message: "Interview added.", tone: "success" })
     } catch (err) {
-      alert("Failed to add interview")
+      setToast({ open: true, message: "Could not add interview. Please try again.", tone: "error" })
     } finally {
       setInterviewSubmitting(false)
     }
@@ -210,6 +221,24 @@ function ApplicationDetail() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <Toast
+        open={toast.open}
+        message={toast.message}
+        tone={toast.tone}
+        onClose={() => setToast((t) => ({ ...t, open: false }))}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Delete application?"
+        message="This will permanently remove it."
+        confirmText="Delete"
+        cancelText="Cancel"
+        tone="danger"
+        onCancel={() => setConfirmDeleteOpen(false)}
+        onConfirm={confirmDelete}
+      />
+
       {!token && !online && (
         <div className="px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
           Offline read-only mode. Editing and deleting require internet + sign-in.
