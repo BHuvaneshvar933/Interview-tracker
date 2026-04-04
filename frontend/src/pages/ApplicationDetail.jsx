@@ -8,6 +8,7 @@ import { getApplication } from "../repo/applicationsRepo"
 import { getToken } from "../utils/auth"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
+import RemindersPanel from "../components/RemindersPanel"
 
 // Icons
 const ArrowLeftIcon = () => (
@@ -215,6 +216,7 @@ function ApplicationDetail() {
   const tabs = [
     { id: "overview", label: "Overview", icon: <BriefcaseIcon /> },
     { id: "interviews", label: "Interviews", icon: <CalendarIcon />, count: application.interviews?.length },
+    { id: "reminders", label: "Reminders", icon: <CalendarIcon /> },
     { id: "description", label: "Job Description", icon: <DocumentIcon /> },
     { id: "timeline", label: "Timeline", icon: <ClockIcon /> },
   ]
@@ -338,6 +340,9 @@ function ApplicationDetail() {
             onAddClick={() => online && setShowInterviewModal(true)}
             canAdd={online}
           />
+        )}
+        {activeTab === "reminders" && (
+          <RemindersPanel applicationId={id} />
         )}
         {activeTab === "description" && (
           <DescriptionTab

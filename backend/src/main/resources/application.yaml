@@ -20,6 +20,13 @@ app:
     secret: ${JWT_SECRET:PLEASE_SET_JWT_SECRET_CHANGE_ME_32CHARS_MINIMUM____}
     expiration-ms: ${JWT_EXPIRATION_MS:3600000}
 
+  push:
+    # Web Push (VAPID) env vars
+    # Generate with: npx web-push generate-vapid-keys
+    public-key: ${VAPID_PUBLIC_KEY:}
+    private-key: ${VAPID_PRIVATE_KEY:}
+    subject: ${VAPID_SUBJECT:mailto:admin@example.com}
+
 # AI Features (Gemini)
 # Required env vars:
 # - GEMINI_API_KEY

@@ -7,6 +7,7 @@ import Analytics from "./pages/Analytics"
 import AiTools from "./pages/AiTools"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
+import PushToggle from "./components/PushToggle"
 
 function App() {
   return (
@@ -55,7 +56,10 @@ function App() {
           element={
             <ProtectedRoute>
               <Layout>
-                <AiTools />
+                <div className="space-y-6">
+                  <PushToggle />
+                  <AiTools />
+                </div>
               </Layout>
             </ProtectedRoute>
           }
