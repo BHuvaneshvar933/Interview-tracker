@@ -14,6 +14,11 @@ public class SecurityUtil {
             throw new RuntimeException("Unauthenticated");
         }
 
+        // Spring can mark anonymous as authenticated; guard against that.
+        if ("anonymousUser".equals(authentication.getName())) {
+            throw new RuntimeException("Unauthenticated");
+        }
+
         return authentication.getName();
     }
 }
