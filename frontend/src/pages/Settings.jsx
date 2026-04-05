@@ -114,7 +114,6 @@ export default function Settings() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-white">Settings</h1>
-            <p className="text-dark-400 mt-1">Account, notifications, and app diagnostics</p>
           </div>
           <div className="flex items-center gap-2">
             <button type="button" onClick={refreshMe} className="btn-secondary">
@@ -136,12 +135,6 @@ export default function Settings() {
             </TabButton>
             <TabButton active={tab === "notifications"} onClick={() => setTab("notifications")} icon={<BellIcon />}>
               Notifications
-            </TabButton>
-            <TabButton active={tab === "security"} onClick={() => setTab("security")} icon={<ShieldIcon />}>
-              Security
-            </TabButton>
-            <TabButton active={tab === "diagnostics"} onClick={() => setTab("diagnostics")} icon={<DatabaseIcon />}>
-              Diagnostics
             </TabButton>
           </nav>
         </div>
@@ -175,16 +168,7 @@ export default function Settings() {
             )}
           </div>
 
-          <div className="card">
-            <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
-            <p className="text-dark-400 text-sm mt-1">Helpful shortcuts</p>
-
-            <div className="mt-6 space-y-3">
-              <button type="button" className="btn-secondary w-full" onClick={() => window.location.reload()}>
-                Reload app
-              </button>
-            </div>
-          </div>
+          
         </div>
       )}
 
@@ -201,75 +185,7 @@ export default function Settings() {
         </div>
       )}
 
-      {tab === "security" && (
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="card">
-            <h2 className="text-xl font-semibold text-white">Session</h2>
-            <p className="text-dark-400 text-sm mt-1">Sign-in state and server token behavior</p>
-
-            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
-              <div className="text-dark-400 text-xs">Signed in</div>
-              <div className="mt-1 text-white font-semibold">{token ? "Yes" : "No"}</div>
-            </div>
-
-            <div className="mt-4 text-dark-500 text-xs">
-              Rotating server `JWT_SECRET` invalidates all existing sessions.
-            </div>
-          </div>
-
-          <div className="card">
-            <h2 className="text-xl font-semibold text-white">Data Safety</h2>
-            <p className="text-dark-400 text-sm mt-1">Offline cached data stays on-device</p>
-            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3 text-dark-300 text-sm">
-              Signing out removes your token. Cached application data may still be visible offline.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {tab === "diagnostics" && (
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="card">
-            <h2 className="text-xl font-semibold text-white">Connectivity</h2>
-            <div className="mt-6 space-y-3">
-              <DiagRow label="Online" value={online ? "Yes" : "No"} />
-              <DiagRow label="Service Worker" value={"serviceWorker" in navigator ? "Supported" : "Not supported"} />
-              <DiagRow label="Push" value={"PushManager" in window ? "Supported" : "Not supported"} />
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="text-white font-semibold">Advanced diagnostics</div>
-                  <div className="text-dark-400 text-sm mt-1">Hidden by default for safety on shared screens</div>
-                </div>
-                <button type="button" className={showAdvanced ? "btn-secondary" : "btn-ghost"} onClick={() => setShowAdvanced((v) => !v)}>
-                  {showAdvanced ? "Hide" : "Show"}
-                </button>
-              </div>
-
-              {showAdvanced && (
-                <div className="mt-4 space-y-3">
-                  <DiagRow label="API Base URL" value={env.apiBase} mono />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="card">
-            <h2 className="text-xl font-semibold text-white">Troubleshooting</h2>
-            <p className="text-dark-400 text-sm mt-1">When notifications or offline mode act weird</p>
-            <div className="mt-6 space-y-3 text-dark-300 text-sm">
-              <div className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
-                If push won’t subscribe, reload once after first install so the service worker is fully ready.
-              </div>
-              <div className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
-                If you changed backend `ALLOWED_ORIGINS` or `JWT_SECRET`, sign out and sign in again.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+     
     </div>
   )
 }
