@@ -39,13 +39,6 @@ const LogoutIcon = () => (
   </svg>
 )
 
-function maskToken(token) {
-  if (!token) return ""
-  const t = String(token)
-  if (t.length <= 16) return t
-  return `${t.slice(0, 8)}…${t.slice(-8)}`
-}
-
 function isPwaLike() {
   if (typeof window === "undefined") return false
   // iOS Safari uses navigator.standalone; other browsers use display-mode media query.
@@ -62,6 +55,7 @@ export default function Settings() {
   const [me, setMe] = useState(null)
   const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
   const [confirmLogout, setConfirmLogout] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const env = useMemo(() => {
     const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
@@ -169,7 +163,6 @@ export default function Settings() {
             <div className="mt-6 grid sm:grid-cols-2 gap-4">
               <InfoField label="Email" value={me?.email || (meLoading ? "Loading…" : meError ? "—" : "—")} />
               <InfoField label="Role" value={me?.role || "—"} />
-              <InfoField label="User ID" value={me?.id || "—"} />
               <InfoField label="PWA Mode" value={env.pwa ? "Installed" : "Browser"} />
             </div>
 
@@ -189,20 +182,6 @@ export default function Settings() {
             <div className="mt-6 space-y-3">
               <button type="button" className="btn-secondary w-full" onClick={() => window.location.reload()}>
                 Reload app
-              </button>
-              <button
-                type="button"
-                className="btn-ghost w-full"
-                onClick={() => {
-                  try {
-                    navigator.clipboard?.writeText(env.apiBase)
-                    setToast({ open: true, message: "API base URL copied.", tone: "success" })
-                  } catch {
-                    setToast({ open: true, message: "Could not copy.", tone: "error" })
-                  }
-                }}
-              >
-                Copy API base URL
               </button>
             </div>
           </div>
@@ -226,14 +205,15 @@ export default function Settings() {
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="card">
             <h2 className="text-xl font-semibold text-white">Session</h2>
-            <p className="text-dark-400 text-sm mt-1">Your local auth token (never share this)</p>
+            <p className="text-dark-400 text-sm mt-1">Sign-in state and server token behavior</p>
 
-            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-900/40 px-4 py-3">
-              <div className="text-dark-400 text-xs">Token</div>
-              <div className="mt-1 text-white font-mono text-sm break-all">{token ? maskToken(token) : "—"}</div>
+            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
+              <div className="text-dark-400 text-xs">Signed in</div>
+              <div className="mt-1 text-white font-semibold">{token ? "Yes" : "No"}</div>
             </div>
+
             <div className="mt-4 text-dark-500 text-xs">
-              If you rotate `JWT_SECRET` on the server, all existing tokens become invalid.
+              Rotating server `JWT_SECRET` invalidates all existing sessions.
             </div>
           </div>
 
@@ -253,9 +233,26 @@ export default function Settings() {
             <h2 className="text-xl font-semibold text-white">Connectivity</h2>
             <div className="mt-6 space-y-3">
               <DiagRow label="Online" value={online ? "Yes" : "No"} />
-              <DiagRow label="API Base URL" value={env.apiBase} mono />
               <DiagRow label="Service Worker" value={"serviceWorker" in navigator ? "Supported" : "Not supported"} />
               <DiagRow label="Push" value={"PushManager" in window ? "Supported" : "Not supported"} />
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-white font-semibold">Advanced diagnostics</div>
+                  <div className="text-dark-400 text-sm mt-1">Hidden by default for safety on shared screens</div>
+                </div>
+                <button type="button" className={showAdvanced ? "btn-secondary" : "btn-ghost"} onClick={() => setShowAdvanced((v) => !v)}>
+                  {showAdvanced ? "Hide" : "Show"}
+                </button>
+              </div>
+
+              {showAdvanced && (
+                <div className="mt-4 space-y-3">
+                  <DiagRow label="API Base URL" value={env.apiBase} mono />
+                </div>
+              )}
             </div>
           </div>
 
