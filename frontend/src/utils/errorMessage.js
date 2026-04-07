@@ -1,6 +1,22 @@
 export function toUserMessage(err, fallback) {
   const status = err?.response?.status
   const apiMsg = err?.response?.data?.message
+  const combined = `${apiMsg || ""} ${err?.message || ""}`.toLowerCase()
+
+  // AI provider billing/quota/credits exhausted
+  const looksLikeCreditsGone =
+    status === 402 ||
+    combined.includes("payment required") ||
+    combined.includes("billing") ||
+    combined.includes("insufficient") ||
+    combined.includes("credits") ||
+    combined.includes("credit") ||
+    combined.includes("quota") ||
+    combined.includes("resource_exhausted") ||
+    combined.includes("quota exceeded")
+  if (looksLikeCreditsGone) {
+    return "AI credits/quota for this project are exhausted. Add credits (or update billing/API key) and try again."
+  }
 
   if (status === 429) return "AI is rate-limited right now. Wait 30-60 seconds and try again."
   if (status === 413) return "That file is too large. Try a smaller PDF."

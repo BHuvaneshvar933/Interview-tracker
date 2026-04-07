@@ -10,5 +10,9 @@ import java.util.List;
 public interface ReminderRepository extends MongoRepository<Reminder, String> {
     List<Reminder> findByUserIdOrderByRemindAtAsc(String userId);
 
+    List<Reminder> findByUserIdAndTodoIdOrderByRemindAtAsc(String userId, String todoId);
+
+    long deleteByUserIdAndTodoId(String userId, String todoId);
+
     List<Reminder> findByStatusAndRemindAtLessThanEqual(ReminderStatus status, Instant now);
 }

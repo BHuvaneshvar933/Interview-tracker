@@ -36,7 +36,7 @@ export default function RemindersPanel({ applicationId, todoId }) {
   const [confirm, setConfirm] = useState({ open: false, id: null })
 
   const [form, setForm] = useState(() => ({
-    title: "Follow up",
+    title: todoId ? "To-do reminder" : "Follow up",
     message: "",
     remindAtLocal: toLocalDatetimeInputValue(new Date(Date.now() + 60 * 60 * 1000)),
   }))
@@ -178,7 +178,13 @@ export default function RemindersPanel({ applicationId, todoId }) {
         <div className="flex items-center justify-between gap-4">
           <div>
             <div className="text-white font-semibold">Upcoming</div>
-            <p className="text-dark-400 text-sm mt-1">Only reminders for this application are shown here.</p>
+            <p className="text-dark-400 text-sm mt-1">
+              {todoId
+                ? "Only reminders for this to-do are shown here."
+                : applicationId
+                  ? "Only reminders for this application are shown here."
+                  : "All reminders are shown here."}
+            </p>
           </div>
           <button type="button" onClick={load} className="btn-ghost">
             Refresh

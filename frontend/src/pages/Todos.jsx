@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { createTodo, deleteTodo, listTodos, updateTodo } from "../api/todos"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import Toast from "../components/Toast"
@@ -50,6 +51,18 @@ function formatDue(due) {
   }
 }
 
+function isOverdue(due) {
+  if (!due) return false
+  try {
+    const today = new Date()
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()
+    const d = new Date(`${due}T00:00:00`).getTime()
+    return d < t
+  } catch {
+    return false
+  }
+}
+
 function priorityTone(priority) {
   const p = (priority || "").toUpperCase()
   if (p === "HIGH") return "border-danger-500/30 bg-danger-500/10 text-danger-300"
@@ -59,6 +72,7 @@ function priorityTone(priority) {
 
 export default function Todos() {
   const online = useOnlineStatus()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -67,6 +81,18 @@ export default function Todos() {
   const [confirm, setConfirm] = useState({ open: false, id: null })
 
   const [openRemindersForId, setOpenRemindersForId] = useState(null)
+
+  useEffect(() => {
+    const fromUrl = searchParams.get("todoId")
+    if (fromUrl) {
+      setOpenRemindersForId(fromUrl)
+      // Scroll/highlight target todo if it's in the current list.
+      window.setTimeout(() => {
+        const el = document.getElementById(`todo-${fromUrl}`)
+        if (el?.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" })
+      }, 50)
+    }
+  }, [searchParams])
 
   const [status, setStatus] = useState("active")
   const [category, setCategory] = useState("")
@@ -246,7 +272,11 @@ export default function Todos() {
       ) : (
         <div className="space-y-3">
           {items.map((t) => (
-            <div key={t.id} className="card hover:border-dark-600">
+            <div
+              key={t.id}
+              id={`todo-${t.id}`}
+              className={`card hover:border-dark-600 ${t.id === openRemindersForId ? "ring-1 ring-primary-500/40" : ""}`}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
                   <button
@@ -275,6 +305,11 @@ export default function Todos() {
                       <span className="text-xs px-2.5 py-1 rounded-full border border-dark-700 bg-dark-800/40 text-dark-300">
                         {formatDue(t.dueDate)}
                       </span>
+                      {t.dueDate && !t.completed && isOverdue(t.dueDate) && (
+                        <span className="text-xs px-2.5 py-1 rounded-full border border-danger-500/30 bg-danger-500/10 text-danger-300">
+                          Overdue
+                        </span>
+                      )}
                       {t.category ? (
                         <span className="text-xs px-2.5 py-1 rounded-full border border-primary-500/20 bg-primary-500/10 text-primary-300">
                           {t.category}
@@ -287,7 +322,10 @@ export default function Todos() {
                 <div className="flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => setOpenRemindersForId(t.id)}
+                    onClick={() => {
+                      setOpenRemindersForId(t.id)
+                      setSearchParams({ todoId: t.id })
+                    }}
                     className="btn-ghost text-primary-300 flex items-center justify-center"
                     aria-label="Remind me"
                     title="Remind me"
@@ -310,14 +348,27 @@ export default function Todos() {
       )}
 
       {openRemindersForId && (
-        <div className="modal-overlay" onClick={() => setOpenRemindersForId(null)}>
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            setOpenRemindersForId(null)
+            setSearchParams({})
+          }}
+        >
           <div className="modal-content max-w-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-white">To-do reminders</h2>
                 <p className="text-dark-400 mt-1">Create a reminder and get a push notification (if enabled).</p>
               </div>
-              <button type="button" className="btn-ghost" onClick={() => setOpenRemindersForId(null)}>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  setOpenRemindersForId(null)
+                  setSearchParams({})
+                }}
+              >
                 Close
               </button>
             </div>

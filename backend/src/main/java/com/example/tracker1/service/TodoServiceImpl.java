@@ -10,6 +10,7 @@ import com.example.tracker1.model.entity.TodoPriority;
 import com.example.tracker1.model.entity.User;
 import com.example.tracker1.repository.TodoRepository;
 import com.example.tracker1.repository.UserRepository;
+import com.example.tracker1.repository.ReminderRepository;
 import com.example.tracker1.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class TodoServiceImpl implements TodoService {
 
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
+    private final ReminderRepository reminderRepository;
 
     private User getCurrentUser() {
         String email = SecurityUtil.getCurrentUserEmail();
@@ -137,6 +139,9 @@ public class TodoServiceImpl implements TodoService {
         User user = getCurrentUser();
         Todo todo = todoRepository.findByIdAndUserId(id, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Todo not found"));
+
+        // Cleanup reminders attached to this todo.
+        reminderRepository.deleteByUserIdAndTodoId(user.getId(), id);
         todoRepository.delete(todo);
     }
 

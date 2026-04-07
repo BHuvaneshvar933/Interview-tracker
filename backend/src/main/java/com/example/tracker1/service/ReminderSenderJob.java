@@ -43,7 +43,7 @@ public class ReminderSenderJob {
 
                 String url = r.getApplicationId() != null && !r.getApplicationId().isBlank()
                         ? "/applications/" + r.getApplicationId()
-                        : (r.getTodoId() != null && !r.getTodoId().isBlank() ? "/todos" : "/dashboard");
+                        : (r.getTodoId() != null && !r.getTodoId().isBlank() ? ("/todos?todoId=" + r.getTodoId()) : "/dashboard");
 
                 String title = r.getTitle() != null ? r.getTitle() : "Reminder";
                 String msg = r.getMessage() != null && !r.getMessage().isBlank() ? r.getMessage() : "Don't forget to follow up.";
