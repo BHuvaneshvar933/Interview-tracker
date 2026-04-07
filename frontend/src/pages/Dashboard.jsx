@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { listApplications } from "../repo/applicationsRepo"
 import { listTodos } from "../api/todos"
 import { getSetting, listPomodorosSince, prunePomodorosOlderThan } from "../db"
+import Heatmap90d from "../components/Heatmap90d"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getToken } from "../utils/auth"
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
@@ -32,6 +33,7 @@ export default function Dashboard() {
 
   const [gh, setGh] = useState({ username: "", profile: null, syncedAt: "" })
   const [lc, setLc] = useState({ username: "", profile: null, syncedAt: "" })
+  const [ghContrib, setGhContrib] = useState([])
 
   const loadAppsSummary = async () => {
     try {
@@ -103,6 +105,7 @@ export default function Dashboard() {
         ghUsername,
         ghProfile,
         ghSyncedAt,
+        ghContrib90d,
         lcUsername,
         lcProfile,
         lcSyncedAt,
@@ -110,6 +113,7 @@ export default function Dashboard() {
         getSetting("integrations:githubUsername"),
         getSetting("integrations:githubProfile"),
         getSetting("integrations:githubSyncedAt"),
+        getSetting("integrations:githubContrib90d"),
         getSetting("integrations:leetcodeUsername"),
         getSetting("integrations:leetcodeProfile"),
         getSetting("integrations:leetcodeSyncedAt"),
@@ -117,9 +121,11 @@ export default function Dashboard() {
 
       setGh({ username: ghUsername || "", profile: ghProfile || null, syncedAt: ghSyncedAt || "" })
       setLc({ username: lcUsername || "", profile: lcProfile || null, syncedAt: lcSyncedAt || "" })
+      setGhContrib(Array.isArray(ghContrib90d) ? ghContrib90d : [])
     } catch {
       setGh({ username: "", profile: null, syncedAt: "" })
       setLc({ username: "", profile: null, syncedAt: "" })
+      setGhContrib([])
     }
   }
 
@@ -303,6 +309,40 @@ export default function Dashboard() {
                   <div className="text-dark-400">Hard</div>
                   <div className="text-white font-semibold">{String(lc.profile.hardSolved || 0)}</div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {gh.profile && ghContrib.length > 0 && (
+            <div className="card">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm text-dark-400">GitHub contributions</p>
+                  <p className="mt-1 text-lg font-semibold text-white">@{gh.profile.login || gh.username}</p>
+                </div>
+                <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/settings")}>
+                  Manage <ArrowRightIcon />
+                </button>
+              </div>
+              <div className="mt-4">
+                <Heatmap90d days={ghContrib} tone="primary" />
+              </div>
+            </div>
+          )}
+
+          {lc.profile?.submissionDays90d?.length > 0 && (
+            <div className="card">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm text-dark-400">LeetCode submissions</p>
+                  <p className="mt-1 text-lg font-semibold text-white">@{lc.profile.username || lc.username}</p>
+                </div>
+                <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/settings")}>
+                  Manage <ArrowRightIcon />
+                </button>
+              </div>
+              <div className="mt-4">
+                <Heatmap90d days={lc.profile.submissionDays90d} tone="success" />
               </div>
             </div>
           )}

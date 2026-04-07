@@ -10,6 +10,7 @@ import {
   normalizeGitHubUsername,
   normalizeLeetCodeUsername,
 } from "../utils/integrations"
+import Heatmap90d from "../components/Heatmap90d"
 import PushToggle from "../components/PushToggle"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
@@ -387,12 +388,52 @@ export default function Settings() {
                   {ghError && <div className="mt-2 text-sm text-danger-300">{ghError}</div>}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-dark-700 space-y-2 text-sm">
-                  <DiagRow label="Cached" value={ghProfile ? "Yes" : "No"} />
-                  <DiagRow label="Last sync" value={ghSyncedAt ? new Date(ghSyncedAt).toLocaleString() : "—"} />
-                  <DiagRow label="Contribution history" value={ghContrib?.length ? `${ghContrib.length} days saved` : "—"} />
-                  <DiagRow label="Repos" value={ghProfile ? String(ghProfile.publicRepos || 0) : "—"} />
-                </div>
+                {ghProfile && (
+                  <div className="mt-4 pt-4 border-t border-dark-700">
+                    <div className="flex items-start gap-3">
+                      {ghProfile.avatarUrl ? (
+                        <img
+                          src={ghProfile.avatarUrl}
+                          alt=""
+                          className="w-10 h-10 rounded-xl border border-dark-700 bg-dark-900/30"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl border border-dark-700 bg-dark-900/30" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-white font-semibold truncate">{ghProfile.name || ghProfile.login}</div>
+                        <div className="text-dark-400 text-sm truncate">@{ghProfile.login}</div>
+                      </div>
+                      {ghProfile.htmlUrl && (
+                        <a className="btn-ghost text-sm" href={ghProfile.htmlUrl} target="_blank" rel="noreferrer">
+                          Open
+                        </a>
+                      )}
+                    </div>
+
+                    {ghProfile.bio && (
+                      <div className="mt-3 text-sm text-dark-300 break-words">{ghProfile.bio}</div>
+                    )}
+
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      <MiniStat label="Repos" value={ghProfile.publicRepos} />
+                      <MiniStat label="Followers" value={ghProfile.followers} />
+                      <MiniStat label="Following" value={ghProfile.following} />
+                    </div>
+
+                    <div className="mt-4">
+                      <Heatmap90d days={ghContrib} tone="primary" />
+                      <div className="mt-2 text-xs text-dark-500">Last synced: {ghSyncedAt ? new Date(ghSyncedAt).toLocaleString() : "—"}</div>
+                    </div>
+                  </div>
+                )}
+
+                {!ghProfile && (
+                  <div className="mt-4 pt-4 border-t border-dark-700 text-sm text-dark-400">
+                    Not connected yet.
+                  </div>
+                )}
               </div>
 
               <div className="rounded-2xl border border-dark-700 bg-dark-800/30 p-4">
@@ -413,12 +454,39 @@ export default function Settings() {
                   {lcError && <div className="mt-2 text-sm text-danger-300">{lcError}</div>}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-dark-700 space-y-2 text-sm">
-                  <DiagRow label="Cached" value={lcProfile ? "Yes" : "No"} />
-                  <DiagRow label="Last sync" value={lcSyncedAt ? new Date(lcSyncedAt).toLocaleString() : "—"} />
-                  <DiagRow label="Solved" value={lcProfile ? `${lcProfile.totalSolved || 0}` : "—"} />
-                  <DiagRow label="Submission history" value={lcProfile?.submissionDays90d?.length ? `${lcProfile.submissionDays90d.length} days saved` : "—"} />
-                </div>
+                {lcProfile && (
+                  <div className="mt-4 pt-4 border-t border-dark-700">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-white font-semibold truncate">@{lcProfile.username || lcUsername}</div>
+                        <div className="text-dark-400 text-sm">Solved: <span className="text-white font-semibold">{lcProfile.totalSolved || 0}</span></div>
+                      </div>
+                      {lcUsername && (
+                        <a className="btn-ghost text-sm" href={`https://leetcode.com/${encodeURIComponent(lcUsername)}/`} target="_blank" rel="noreferrer">
+                          Open
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-4 gap-2">
+                      <MiniStat label="Easy" value={lcProfile.easySolved} />
+                      <MiniStat label="Med" value={lcProfile.mediumSolved} />
+                      <MiniStat label="Hard" value={lcProfile.hardSolved} />
+                      <MiniStat label="Total" value={lcProfile.totalSolved} />
+                    </div>
+
+                    <div className="mt-4">
+                      <Heatmap90d days={lcProfile.submissionDays90d} tone="success" />
+                      <div className="mt-2 text-xs text-dark-500">Last synced: {lcSyncedAt ? new Date(lcSyncedAt).toLocaleString() : "—"}</div>
+                    </div>
+                  </div>
+                )}
+
+                {!lcProfile && (
+                  <div className="mt-4 pt-4 border-t border-dark-700 text-sm text-dark-400">
+                    Not connected yet.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -457,6 +525,15 @@ function InfoField({ label, value }) {
     <div className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
       <div className="text-dark-400 text-xs">{label}</div>
       <div className="mt-1 text-white font-semibold break-words">{value}</div>
+    </div>
+  )
+}
+
+function MiniStat({ label, value }) {
+  return (
+    <div className="rounded-xl border border-dark-700 bg-dark-800/40 px-3 py-2">
+      <div className="text-[11px] text-dark-500">{label}</div>
+      <div className="mt-0.5 text-white font-semibold text-sm">{Number(value) || 0}</div>
     </div>
   )
 }
