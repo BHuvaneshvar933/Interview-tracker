@@ -10,6 +10,7 @@ import java.time.Instant;
 public class ReminderResponse {
     private String id;
     private String applicationId;
+    private String todoId;
     private String interviewRoundName;
     private String title;
     private String message;

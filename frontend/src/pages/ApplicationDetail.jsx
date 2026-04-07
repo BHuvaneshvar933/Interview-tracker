@@ -206,9 +206,9 @@ function ApplicationDetail() {
         <XCircleIcon className="w-12 h-12 text-danger-400 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-white mb-2">Error</h3>
         <p className="text-dark-400 mb-6">{error}</p>
-        <button onClick={() => navigate("/dashboard")} className="btn-primary">
-          Back to Dashboard
-        </button>
+          <button onClick={() => navigate("/dashboard")} className="btn-primary">
+            Back to Job Tracker
+          </button>
       </div>
     )
   }

@@ -21,13 +21,13 @@ const TrashIcon = () => (
   </svg>
 )
 
-function isSameApp(a, b) {
+function isSameId(a, b) {
   if (!a && !b) return true
   if (!a || !b) return false
   return String(a) === String(b)
 }
 
-export default function RemindersPanel({ applicationId }) {
+export default function RemindersPanel({ applicationId, todoId }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -54,7 +54,11 @@ export default function RemindersPanel({ applicationId }) {
       setError("")
       const res = await listReminders()
       const all = res.data || []
-      const filtered = applicationId ? all.filter((r) => isSameApp(r.applicationId, applicationId)) : all
+      const filtered = todoId
+        ? all.filter((r) => isSameId(r.todoId, todoId))
+        : applicationId
+          ? all.filter((r) => isSameId(r.applicationId, applicationId))
+          : all
       setItems(filtered)
     } catch (e) {
       setError(e?.response?.data?.message || e?.message || "Failed to load reminders")
@@ -65,7 +69,7 @@ export default function RemindersPanel({ applicationId }) {
 
   useEffect(() => {
     load()
-  }, [applicationId])
+  }, [applicationId, todoId])
 
   const submit = async (e) => {
     e.preventDefault()
@@ -79,6 +83,7 @@ export default function RemindersPanel({ applicationId }) {
       setSubmitting(true)
       await createReminder({
         applicationId,
+        todoId,
         title: form.title,
         message: form.message,
         remindAt,

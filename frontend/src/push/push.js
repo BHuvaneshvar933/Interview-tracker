@@ -18,6 +18,11 @@ export function pushSupported() {
   )
 }
 
+export function getNotificationPermission() {
+  if (typeof window === "undefined" || !("Notification" in window)) return "unsupported"
+  return Notification.permission
+}
+
 export async function getVapidPublicKey() {
   const res = await api.get("/api/push/public-key")
   return (res.data || "").trim()
@@ -25,19 +30,35 @@ export async function getVapidPublicKey() {
 
 export async function getExistingSubscription() {
   if (!pushSupported()) return null
-  const reg = await navigator.serviceWorker.ready
-  return reg.pushManager.getSubscription()
+  const reg = await navigator.serviceWorker.getRegistration()
+  if (reg) return reg.pushManager.getSubscription()
+  const ready = await navigator.serviceWorker.ready
+  return ready.pushManager.getSubscription()
 }
 
 export async function subscribeToPush() {
   if (!pushSupported()) throw new Error("Push not supported")
+
+  // Request permission first while we still have a clear user gesture.
+  // Some mobile browsers won't show a prompt if we await network/async work first.
+  const currentPermission = getNotificationPermission()
+  if (currentPermission === "denied") {
+    throw new Error("Notifications are blocked. Re-enable them in browser/app settings, then try again.")
+  }
+  if (currentPermission !== "granted") {
+    const permission = await Notification.requestPermission()
+    if (permission !== "granted") throw new Error("Notifications permission denied")
+  }
+
   const publicKey = await getVapidPublicKey()
   if (!publicKey) throw new Error("Push is not configured on the server")
 
-  const permission = await Notification.requestPermission()
-  if (permission !== "granted") throw new Error("Notifications permission denied")
+  // Prefer a concrete registration; `ready` can stall if the SW isn't controlling yet.
+  const reg = await navigator.serviceWorker.getRegistration()
+  if (!reg) {
+    throw new Error("Service worker not ready yet. Reload the app once and try again.")
+  }
 
-  const reg = await navigator.serviceWorker.ready
   const sub = await reg.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),

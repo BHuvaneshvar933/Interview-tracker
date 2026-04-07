@@ -16,9 +16,9 @@ export default defineConfig({
       manifestFilename: 'manifest.webmanifest',
       includeAssets: ['pwa-icon.svg', 'vite.svg'],
       manifest: {
-        name: 'JobTracker',
-        short_name: 'JobTracker',
-        description: 'Track job applications and interviews',
+        name: 'Capsule',
+        short_name: 'Capsule',
+        description: 'Your personal capsule for tracking work and life',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',

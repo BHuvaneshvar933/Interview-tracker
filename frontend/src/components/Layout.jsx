@@ -34,6 +34,13 @@ const SettingsIcon = () => (
   </svg>
 )
 
+const CheckListIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 6h11M9 12h11M9 18h11" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h.01M4 12h.01M4 18h.01" />
+  </svg>
+)
+
 const LogoutIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -72,8 +79,9 @@ function Layout({ children }) {
   }
 
   const navItems = [
-    { to: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> },
+    { to: "/dashboard", label: "Job Tracker", icon: <DashboardIcon /> },
     { to: "/analytics", label: "Analytics", icon: <AnalyticsIcon /> },
+    { to: "/todos", label: "To-dos", icon: <CheckListIcon /> },
     { to: "/ai", label: "AI Tools", icon: <SparklesIcon /> },
     { to: "/settings", label: "Settings", icon: <SettingsIcon /> },
   ]
@@ -103,8 +111,8 @@ function Layout({ children }) {
                 <BriefcaseIcon />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">JobTracker</h1>
-                <p className="text-xs text-dark-400">Track your career</p>
+                <h1 className="text-xl font-bold text-white">Capsule</h1>
+                <p className="text-xs text-dark-400">Keep it together</p>
               </div>
             </div>
           </div>
@@ -157,7 +165,7 @@ function Layout({ children }) {
               <div className="p-1.5 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg">
                 <BriefcaseIcon />
               </div>
-              <span className="font-bold text-white">JobTracker</span>
+              <span className="font-bold text-white">Capsule</span>
             </div>
             <div className="w-10" /> {/* Spacer for centering */}
           </div>

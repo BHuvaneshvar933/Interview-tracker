@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react"
-import { getExistingSubscription, pushSupported, subscribeToPush, unsubscribeFromPush } from "../push/push"
+import { useEffect, useMemo, useState } from "react"
+import {
+  getExistingSubscription,
+  getNotificationPermission,
+  pushSupported,
+  subscribeToPush,
+  unsubscribeFromPush,
+} from "../push/push"
 import Toast from "./Toast"
 
 export default function PushToggle() {
@@ -8,6 +14,8 @@ export default function PushToggle() {
   const [busy, setBusy] = useState(false)
   const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
   const [needsReload, setNeedsReload] = useState(false)
+
+  const permission = useMemo(() => getNotificationPermission(), [enabled, supported])
 
   useEffect(() => {
     setSupported(pushSupported())
@@ -45,6 +53,9 @@ export default function PushToggle() {
         setEnabled(false)
         setToast({ open: true, message: "Notifications disabled.", tone: "success" })
       } else {
+        if (permission === "denied") {
+          throw new Error("Notifications are blocked. Re-enable them in browser/app settings, then try again.")
+        }
         await subscribeToPush()
         setEnabled(true)
         setToast({ open: true, message: "Notifications enabled.", tone: "success" })
@@ -72,6 +83,11 @@ export default function PushToggle() {
         <div>
           <div className="text-white font-semibold">Notifications</div>
           <p className="text-dark-400 text-sm mt-1">Enable phone notifications for reminders.</p>
+          {permission === "denied" && (
+            <p className="text-danger-300 text-sm mt-2">
+              Notifications are blocked for this app. Allow notifications in your browser/app settings, then reload and try again.
+            </p>
+          )}
           {needsReload && (
             <p className="text-dark-400 text-sm mt-2">
               If this is your first time enabling notifications, reload the app once so the service worker is ready.
@@ -81,7 +97,7 @@ export default function PushToggle() {
         <button
           type="button"
           onClick={toggle}
-          disabled={busy}
+          disabled={busy || permission === "denied"}
           className={enabled ? "btn-secondary" : "btn-primary"}
         >
           {busy ? "Working..." : enabled ? "Disable" : "Enable"}

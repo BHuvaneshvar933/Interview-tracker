@@ -10,6 +10,7 @@ import com.example.tracker1.model.entity.ReminderStatus;
 import com.example.tracker1.model.entity.User;
 import com.example.tracker1.repository.ApplicationRepository;
 import com.example.tracker1.repository.ReminderRepository;
+import com.example.tracker1.repository.TodoRepository;
 import com.example.tracker1.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,6 +28,7 @@ public class ReminderServiceImpl implements ReminderService {
     private final ReminderRepository reminderRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
+    private final TodoRepository todoRepository;
 
     private String getCurrentUserEmail() {
         Object principal = SecurityContextHolder
@@ -64,9 +66,15 @@ public class ReminderServiceImpl implements ReminderService {
             }
         }
 
+        if (request.getTodoId() != null && !request.getTodoId().isBlank()) {
+            todoRepository.findByIdAndUserId(request.getTodoId(), user.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Todo not found"));
+        }
+
         Reminder reminder = Reminder.builder()
                 .userId(user.getId())
                 .applicationId(request.getApplicationId())
+                .todoId(request.getTodoId())
                 .interviewRoundName(request.getInterviewRoundName())
                 .title(request.getTitle())
                 .message(request.getMessage())
@@ -104,6 +112,7 @@ public class ReminderServiceImpl implements ReminderService {
         return ReminderResponse.builder()
                 .id(r.getId())
                 .applicationId(r.getApplicationId())
+                .todoId(r.getTodoId())
                 .interviewRoundName(r.getInterviewRoundName())
                 .title(r.getTitle())
                 .message(r.getMessage())

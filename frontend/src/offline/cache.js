@@ -1,9 +1,9 @@
 import localforage from "localforage"
 
 const store = localforage.createInstance({
-  name: "jobtracker",
+  name: "capsule",
   storeName: "offline",
-  description: "Offline cache for JobTracker",
+  description: "Offline cache for Capsule",
 })
 
 export async function cacheSet(key, value) {

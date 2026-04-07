@@ -7,6 +7,7 @@ import java.time.Instant;
 @Data
 public class ReminderRequest {
     private String applicationId;
+    private String todoId;
     private String interviewRoundName;
     private String title;
     private String message;

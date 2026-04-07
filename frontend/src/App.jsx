@@ -6,6 +6,7 @@ import ApplicationDetail from "./pages/ApplicationDetail"
 import Analytics from "./pages/Analytics"
 import AiTools from "./pages/AiTools"
 import Settings from "./pages/Settings"
+import Todos from "./pages/Todos"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
 
@@ -68,6 +69,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Settings />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/todos"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Todos />
               </Layout>
             </ProtectedRoute>
           }

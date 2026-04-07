@@ -64,7 +64,11 @@ function Login() {
       const to = location.state?.from || "/dashboard"
       navigate(to)
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password")
+      if (!err?.response) {
+        setError("Can't reach the server right now. Check your connection (or wake the backend) and try again.")
+      } else {
+        setError(err.response?.data?.message || "Sign-in failed. Please try again.")
+      }
     } finally {
       setLoading(false)
     }
@@ -85,7 +89,7 @@ function Login() {
             <div className="p-3 bg-white/10 backdrop-blur-sm rounded-2xl">
               <BriefcaseIcon />
             </div>
-            <span className="text-2xl font-bold text-white">JobTracker</span>
+            <span className="text-2xl font-bold text-white">Capsule</span>
           </div>
         </div>
 
@@ -114,7 +118,7 @@ function Login() {
         </div>
 
         <div className="relative z-10 text-primary-200 text-sm">
-          &copy; 2024 JobTracker. All rights reserved.
+          &copy; 2024 Capsule. All rights reserved.
         </div>
       </div>
 
@@ -126,7 +130,7 @@ function Login() {
             <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg shadow-primary-500/30">
               <BriefcaseIcon />
             </div>
-            <span className="text-2xl font-bold text-white">JobTracker</span>
+            <span className="text-2xl font-bold text-white">Capsule</span>
           </div>
 
           <div className="text-center mb-10">

@@ -23,6 +23,9 @@ public class Reminder {
     @Indexed
     private String applicationId;
 
+    @Indexed
+    private String todoId;
+
     // Optional link to a specific interview (by index or round name). Keep flexible for now.
     private String interviewRoundName;
 
