@@ -41,6 +41,30 @@ const BellIcon = () => (
   </svg>
 )
 
+function ChipGroup({ value, onChange, options }) {
+  return (
+    <div className="rounded-full border border-dark-700 bg-dark-900/20 p-1 flex gap-1 overflow-x-auto scrollbar-hide">
+      {options.map((opt) => {
+        const active = opt.value === value
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+              active
+                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/20"
+                : "text-dark-300 hover:text-white hover:bg-dark-800/60"
+            }`}
+          >
+            {opt.label}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 function formatDue(due) {
   if (!due) return "No due date"
   try {
@@ -97,6 +121,9 @@ export default function Todos() {
   const [status, setStatus] = useState("active")
   const [category, setCategory] = useState("")
   const [q, setQ] = useState("")
+  const [dateScope, setDateScope] = useState("all") // all | today | week
+
+  const [knownCategories, setKnownCategories] = useState(["Work", "DSA", "GATE", "Personal", "Job Hunt"])
 
   const [showNew, setShowNew] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -110,11 +137,55 @@ export default function Todos() {
 
   const categories = useMemo(() => {
     const set = new Set()
-    for (const t of items) {
-      if (t.category) set.add(t.category)
+    for (const c of knownCategories) {
+      const t = String(c || "").trim()
+      if (t) set.add(t)
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b))
-  }, [items])
+  }, [knownCategories])
+
+  const preset = useMemo(() => {
+    if (status === "all" && dateScope === "all") return "all"
+    if (status === "active" && dateScope === "all") return "pending"
+    if (status === "active" && dateScope === "today") return "today"
+    if (status === "active" && dateScope === "week") return "week"
+    if (status === "completed" && dateScope === "all") return "done"
+    return "custom"
+  }, [status, dateScope])
+
+  const setPreset = (next) => {
+    if (next === "all") {
+      setStatus("all")
+      setDateScope("all")
+      return
+    }
+    if (next === "pending") {
+      setStatus("active")
+      setDateScope("all")
+      return
+    }
+    if (next === "today") {
+      setStatus("active")
+      setDateScope("today")
+      return
+    }
+    if (next === "week") {
+      setStatus("active")
+      setDateScope("week")
+      return
+    }
+    if (next === "done") {
+      setStatus("completed")
+      setDateScope("all")
+    }
+  }
+
+  const updateQueryParam = (key, value) => {
+    const next = new URLSearchParams(searchParams)
+    if (value == null || String(value).trim() === "") next.delete(key)
+    else next.set(key, String(value))
+    setSearchParams(next)
+  }
 
   const load = async () => {
     try {
@@ -122,6 +193,12 @@ export default function Todos() {
       setError("")
       const res = await listTodos({ status, category: category || undefined, q: q || undefined })
       setItems(res.data || [])
+
+      const nextCats = new Set(knownCategories.map((c) => String(c || "").trim()).filter(Boolean))
+      for (const t of res.data || []) {
+        if (t?.category) nextCats.add(String(t.category).trim())
+      }
+      setKnownCategories(Array.from(nextCats))
     } catch (e) {
       setError(e?.response?.data?.message || e?.message || "Failed to load todos")
     } finally {
@@ -138,6 +215,33 @@ export default function Todos() {
     const t = setTimeout(load, 250)
     return () => clearTimeout(t)
   }, [online, status, category, q])
+
+  const visibleItems = useMemo(() => {
+    if (dateScope === "all") return items
+
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const day = today.getDay() // 0..6 (Sun..Sat)
+    const mondayOffset = (day + 6) % 7
+    const weekStart = new Date(today)
+    weekStart.setDate(today.getDate() - mondayOffset)
+    const weekEnd = new Date(weekStart)
+    weekEnd.setDate(weekStart.getDate() + 6)
+
+    const startMs = dateScope === "today" ? today.getTime() : weekStart.getTime()
+    const endMs = dateScope === "today" ? today.getTime() : weekEnd.getTime()
+
+    return (items || []).filter((t) => {
+      if (!t?.dueDate) return false
+      try {
+        const d = new Date(`${t.dueDate}T00:00:00`)
+        const ms = d.getTime()
+        return ms >= startMs && ms <= endMs
+      } catch {
+        return false
+      }
+    })
+  }, [items, dateScope])
 
   const submit = async (e) => {
     e.preventDefault()
@@ -167,8 +271,14 @@ export default function Todos() {
 
   const toggleComplete = async (todo) => {
     try {
-      await updateTodo(todo.id, { completed: !todo.completed })
-      setItems((prev) => prev.map((t) => (t.id === todo.id ? { ...t, completed: !t.completed } : t)))
+      const nextCompleted = !todo.completed
+      await updateTodo(todo.id, { completed: nextCompleted })
+      setItems((prev) => {
+        const updated = prev.map((t) => (t.id === todo.id ? { ...t, completed: nextCompleted } : t))
+        if (status === "active" && nextCompleted) return updated.filter((t) => t.id !== todo.id)
+        if (status === "completed" && !nextCompleted) return updated.filter((t) => t.id !== todo.id)
+        return updated
+      })
     } catch {
       setToast({ open: true, message: "Could not update to-do.", tone: "error" })
     }
@@ -219,8 +329,8 @@ export default function Todos() {
       </div>
 
       <div className="card">
-        <div className="grid lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-2 relative">
+        <div className="space-y-4">
+          <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-dark-400">
               <SearchIcon />
             </div>
@@ -232,20 +342,23 @@ export default function Todos() {
             />
           </div>
 
-          <select value={status} onChange={(e) => setStatus(e.target.value)} className="select-field">
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="all">All</option>
-          </select>
+          <ChipGroup
+            value={preset}
+            onChange={setPreset}
+            options={[
+              { value: "all", label: "All" },
+              { value: "pending", label: "Pending" },
+              { value: "today", label: "Today" },
+              { value: "week", label: "This Week" },
+              { value: "done", label: "Done" },
+            ]}
+          />
 
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="select-field">
-            <option value="">All categories</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <ChipGroup
+            value={category || "__all"}
+            onChange={(v) => setCategory(v === "__all" ? "" : v)}
+            options={[{ value: "__all", label: "All" }, ...categories.map((c) => ({ value: c, label: c }))]}
+          />
         </div>
       </div>
 
@@ -261,17 +374,17 @@ export default function Todos() {
         <div className="card border-danger-500/30 bg-danger-500/10">
           <div className="text-danger-300">{error}</div>
         </div>
-      ) : items.length === 0 ? (
+      ) : visibleItems.length === 0 ? (
         <div className="card text-center py-14">
-          <div className="text-white font-semibold">No to-dos yet</div>
-          <div className="text-dark-400 mt-1">Create one and start checking them off.</div>
+          <div className="text-white font-semibold">No to-dos found</div>
+          <div className="text-dark-400 mt-1">Try adjusting your filters, or create a new one.</div>
           <button type="button" className="btn-secondary mt-5" onClick={() => setShowNew(true)}>
             Create your first to-do
           </button>
         </div>
       ) : (
         <div className="space-y-3">
-          {items.map((t) => (
+          {visibleItems.map((t) => (
             <div
               key={t.id}
               id={`todo-${t.id}`}
@@ -324,7 +437,7 @@ export default function Todos() {
                     type="button"
                     onClick={() => {
                       setOpenRemindersForId(t.id)
-                      setSearchParams({ todoId: t.id })
+                      updateQueryParam("todoId", t.id)
                     }}
                     className="btn-ghost text-primary-300 flex items-center justify-center"
                     aria-label="Remind me"
@@ -352,7 +465,7 @@ export default function Todos() {
           className="modal-overlay"
           onClick={() => {
             setOpenRemindersForId(null)
-            setSearchParams({})
+            updateQueryParam("todoId", "")
           }}
         >
           <div className="modal-content max-w-3xl" onClick={(e) => e.stopPropagation()}>
@@ -366,7 +479,7 @@ export default function Todos() {
                 className="btn-ghost"
                 onClick={() => {
                   setOpenRemindersForId(null)
-                  setSearchParams({})
+                  updateQueryParam("todoId", "")
                 }}
               >
                 Close
@@ -441,11 +554,17 @@ export default function Todos() {
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-2">Category</label>
                   <input
+                    list="todo-category-list"
                     value={form.category}
                     onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                     className="input-field"
-                    placeholder="e.g. Interviews"
+                    placeholder="Choose or type…"
                   />
+                  <datalist id="todo-category-list">
+                    {categories.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
