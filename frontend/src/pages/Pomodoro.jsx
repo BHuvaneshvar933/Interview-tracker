@@ -79,6 +79,12 @@ function yyyyMmDd(d) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
+function dayKeyFromIso(iso) {
+  const d = new Date(iso || 0)
+  if (Number.isNaN(d.getTime())) return ""
+  return yyyyMmDd(d)
+}
+
 function parseTags(raw) {
   if (!raw) return []
   return String(raw)
@@ -213,10 +219,15 @@ export default function Pomodoro() {
     refreshRecent()
   }, [])
 
-  // When mode changes, reset timer if not running.
+  // When mode changes (via mode buttons), reset timer if not running.
+  // Do NOT reset on pause/stop, otherwise resume can't work.
+  const lastModeKeyRef = useRef(`${modeIndex}:${mode.seconds}`)
   useEffect(() => {
     if (isRunning) return
-    setTimeLeft(mode.seconds)
+    const nextKey = `${modeIndex}:${mode.seconds}`
+    const changed = lastModeKeyRef.current !== nextKey
+    lastModeKeyRef.current = nextKey
+    if (changed) setTimeLeft(mode.seconds)
   }, [modeIndex, mode.seconds, isRunning])
 
   // Running tick (wall-clock based so it stays accurate in background).
@@ -281,11 +292,8 @@ export default function Pomodoro() {
       await logWorkIfNeeded(finalTimeLeft)
     }
 
-    // Stop: never auto-switch.
-    if (isStop) {
-      setTimeLeft(m?.seconds || modes[0].seconds)
-      return
-    }
+    // Stop: never auto-switch, and keep remaining time (so user can resume).
+    if (isStop) return
 
     // Determine next mode.
     if (isWork) {
@@ -332,7 +340,10 @@ export default function Pomodoro() {
   }
 
   const stopAndLog = () => {
-    completeSession(true, timeLeftRef.current)
+    const endAt = endAtRef.current
+    const remaining = endAt ? Math.max(0, Math.round((endAt - Date.now()) / 1000)) : (timeLeftRef.current || 0)
+    setTimeLeft(remaining)
+    completeSession(true, remaining)
   }
 
   const skip = () => {
@@ -381,7 +392,7 @@ export default function Pomodoro() {
 
   const todayStr = yyyyMmDd(new Date())
   const todayPoms = useMemo(() => {
-    return (recentPomodoros || []).filter((p) => String(p.completedAt || "").startsWith(todayStr))
+    return (recentPomodoros || []).filter((p) => dayKeyFromIso(p?.completedAt) === todayStr)
   }, [recentPomodoros, todayStr])
 
   const todayMinutes = useMemo(() => todayPoms.reduce((sum, p) => sum + (Number(p.duration) || 0), 0), [todayPoms])
@@ -390,7 +401,7 @@ export default function Pomodoro() {
     const map = {}
     for (const p of recentPomodoros || []) {
       if (p?.type !== "work") continue
-      const day = String(p.completedAt || "").slice(0, 10)
+      const day = dayKeyFromIso(p?.completedAt)
       if (!day) continue
       map[day] = (map[day] || 0) + (Number(p.duration) || 0)
     }
@@ -398,7 +409,7 @@ export default function Pomodoro() {
   }, [recentPomodoros])
 
   const displayPomodoros = useMemo(() => {
-    const list = (recentPomodoros || []).filter((p) => String(p.completedAt || "").startsWith(selectedDate))
+    const list = (recentPomodoros || []).filter((p) => dayKeyFromIso(p?.completedAt) === selectedDate)
     list.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     return list
   }, [recentPomodoros, selectedDate])
@@ -518,7 +529,7 @@ export default function Pomodoro() {
             <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-center gap-3">
               <button type="button" onClick={toggleRunning} className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
                 {isRunning ? <PauseIcon /> : <PlayIcon />}
-                {isRunning ? "Pause" : "Start"}
+                {isRunning ? "Pause" : timeLeft < mode.seconds ? "Resume" : "Start"}
               </button>
               <button type="button" onClick={reset} className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto">
                 <ResetIcon />
@@ -527,7 +538,7 @@ export default function Pomodoro() {
               {isRunning && (
                 <button type="button" onClick={stopAndLog} className="btn-danger flex items-center justify-center gap-2 w-full sm:w-auto">
                   <StopIcon />
-                  Stop & Log
+                  Pause & Log
                 </button>
               )}
               <button type="button" onClick={skip} className="btn-ghost flex items-center justify-center gap-2 w-full sm:w-auto">
