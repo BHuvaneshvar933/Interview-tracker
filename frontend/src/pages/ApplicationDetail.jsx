@@ -155,7 +155,7 @@ function ApplicationDetail() {
     try {
       await deleteApplication(id)
       setToast({ open: true, message: "Application deleted.", tone: "success" })
-      navigate("/dashboard")
+      navigate("/job-tracker")
     } catch {
       setToast({ open: true, message: "Could not delete application. Please try again.", tone: "error" })
     }
@@ -206,7 +206,7 @@ function ApplicationDetail() {
         <XCircleIcon className="w-12 h-12 text-danger-400 mx-auto mb-4" />
         <h3 className="text-xl font-semibold text-white mb-2">Error</h3>
         <p className="text-dark-400 mb-6">{error}</p>
-          <button onClick={() => navigate("/dashboard")} className="btn-primary">
+          <button onClick={() => navigate("/job-tracker")} className="btn-primary">
             Back to Job Tracker
           </button>
       </div>
@@ -250,7 +250,7 @@ function ApplicationDetail() {
      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 w-full overflow-hidden">
         <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/job-tracker")}
             className="p-2 text-dark-400 hover:text-white hover:bg-dark-700 rounded-xl transition-all mt-1"
           >
             <ArrowLeftIcon />

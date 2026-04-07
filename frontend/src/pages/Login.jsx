@@ -152,7 +152,7 @@ function Login() {
               <div className="mt-4 flex justify-center">
                 <button
                   type="button"
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/job-tracker")}
                   className="btn-secondary"
                 >
                   Browse cached applications

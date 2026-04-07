@@ -41,6 +41,18 @@ const CheckListIcon = () => (
   </svg>
 )
 
+const TimerIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8v4l2 2m6-2a8 8 0 11-16 0 8 8 0 0116 0z"
+    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3h6" />
+  </svg>
+)
+
 const LogoutIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -48,6 +60,12 @@ const LogoutIcon = () => (
 )
 
 const BriefcaseIcon = () => (
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+  </svg>
+)
+
+const BrandIcon = () => (
   <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
@@ -78,12 +96,30 @@ function Layout({ children }) {
     navigate("/")
   }
 
-  const navItems = [
-    { to: "/dashboard", label: "Job Tracker", icon: <DashboardIcon /> },
-    { to: "/analytics", label: "Analytics", icon: <AnalyticsIcon /> },
-    { to: "/todos", label: "To-dos", icon: <CheckListIcon /> },
-    { to: "/ai", label: "AI Tools", icon: <SparklesIcon /> },
-    { to: "/settings", label: "Settings", icon: <SettingsIcon /> },
+  const navGroups = [
+    {
+      title: "Dashboard",
+      items: [{ to: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> }],
+    },
+    {
+      title: "Career",
+      items: [
+        { to: "/job-tracker", label: "Job Tracker", icon: <BriefcaseIcon /> },
+        { to: "/analytics", label: "Analytics", icon: <AnalyticsIcon /> },
+        { to: "/ai", label: "AI Tools", icon: <SparklesIcon /> },
+      ],
+    },
+    {
+      title: "Focus",
+      items: [
+        { to: "/todos", label: "To-dos", icon: <CheckListIcon /> },
+        { to: "/pomodoro", label: "Pomodoro", icon: <TimerIcon /> },
+      ],
+    },
+    {
+      title: "Settings",
+      items: [{ to: "/settings", label: "Settings", icon: <SettingsIcon /> }],
+    },
   ]
 
   return (
@@ -108,7 +144,7 @@ function Layout({ children }) {
           <div className="p-6 border-b border-dark-700/50">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg shadow-primary-500/30">
-                <BriefcaseIcon />
+                <BrandIcon />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Capsule</h1>
@@ -119,21 +155,25 @@ function Layout({ children }) {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            <p className="px-4 py-2 text-xs font-semibold text-dark-500 uppercase tracking-wider">
-              Menu
-            </p>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => setSidebarOpen(false)}
-                className={({ isActive }) =>
-                  isActive ? "nav-item-active" : "nav-item"
-                }
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </NavLink>
+            {navGroups.map((group, gi) => (
+              <div key={group.title} className={gi === 0 ? "" : "pt-3"}>
+                <p className="px-4 py-2 text-xs font-semibold text-dark-500 uppercase tracking-wider">
+                  {group.title}
+                </p>
+                <div className="space-y-2">
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setSidebarOpen(false)}
+                      className={({ isActive }) => (isActive ? "nav-item-active" : "nav-item")}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
 
@@ -163,7 +203,7 @@ function Layout({ children }) {
             </button>
             <div className="flex items-center gap-2">
               <div className="p-1.5 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg">
-                <BriefcaseIcon />
+                <BrandIcon />
               </div>
               <span className="font-bold text-white">Capsule</span>
             </div>

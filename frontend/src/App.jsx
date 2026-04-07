@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
+import JobTracker from "./pages/JobTracker"
 import ApplicationDetail from "./pages/ApplicationDetail"
 import Analytics from "./pages/Analytics"
 import AiTools from "./pages/AiTools"
 import Settings from "./pages/Settings"
 import Todos from "./pages/Todos"
+import Pomodoro from "./pages/Pomodoro"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
 
@@ -25,6 +27,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/job-tracker"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <JobTracker />
               </Layout>
             </ProtectedRoute>
           }
@@ -80,6 +93,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Todos />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/pomodoro"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Pomodoro />
               </Layout>
             </ProtectedRoute>
           }

@@ -188,16 +188,17 @@ function FileDrop({ file, setFile, disabled }) {
       }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-4 min-w-0">
           <div className="p-3 rounded-xl bg-dark-700 text-dark-200">
             <UploadIcon />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-white font-semibold">Upload resume (PDF)</div>
             <div className="text-dark-400 text-sm">Drag & drop or browse. Stored securely per user.</div>
             {file && (
-              <div className="mt-2 text-sm text-dark-200">
-                <span className="font-medium">{file.name}</span> <span className="text-dark-500">({formatBytes(file.size)})</span>
+              <div className="mt-2 text-sm text-dark-200 min-w-0">
+                <span className="font-medium break-all">{file.name}</span>{" "}
+                <span className="text-dark-500">({formatBytes(file.size)})</span>
               </div>
             )}
           </div>
@@ -725,8 +726,8 @@ function ResumeLibrary({ online, resumesLoading, resumesError, resumes, onRefres
             {resumes.map((r) => (
               <div key={r.resumeId} className="p-4 rounded-2xl bg-dark-700/30 border border-dark-600">
                 <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="text-white font-medium">{r.fileName || "(unnamed)"}</div>
+                  <div className="min-w-0">
+                    <div className="text-white font-medium break-all">{r.fileName || "(unnamed)"}</div>
                     <div className="text-xs text-dark-500 font-mono mt-1">{r.resumeId}</div>
                   </div>
                   <div className="text-right text-xs text-dark-500">
