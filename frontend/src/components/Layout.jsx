@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { logout } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getToken } from "../utils/auth"
+import BackendWakeBanner from "./BackendWakeBanner"
 
 // Icons as simple SVG components
 const DashboardIcon = () => (
@@ -219,6 +220,7 @@ function Layout({ children }) {
               {!token && " (Read-only until you sign in again.)"}
             </div>
           )}
+          <BackendWakeBanner />
           <div className="animate-fade-in">
             {children}
           </div>

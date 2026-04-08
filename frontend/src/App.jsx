@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
@@ -11,8 +12,14 @@ import Todos from "./pages/Todos"
 import Pomodoro from "./pages/Pomodoro"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
+import { warmUpBackend } from "./api/axios"
 
 function App() {
+  useEffect(() => {
+    // Render free tier cold starts: attempt a gentle warm-up on load.
+    warmUpBackend({ reason: "startup" })
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>
