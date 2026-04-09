@@ -16,6 +16,7 @@ export default function BackendWakeBanner() {
     attempt: 0,
     reason: "",
     error: "",
+    httpStatus: 0,
   })
 
   const [now, setNow] = useState(() => Date.now())
@@ -42,18 +43,40 @@ export default function BackendWakeBanner() {
       return {
         tone: "border-warning-500/30 bg-warning-500/10 text-warning-300",
         title: "Waking up server",
-        body: "Backend is on Render free tier; first request may take a bit.",
+        body: "The server was idle. This can take a few seconds.",
       }
     }
     if (state.status === "failed") {
+      const s = Number(state.httpStatus) || 0
+      if (s === 521) {
+        return {
+          tone: "border-danger-500/30 bg-danger-500/10 text-danger-300",
+          title: "Server is down",
+          body: "Error 521: Web server is down. Try again in a moment.",
+        }
+      }
+      if (s === 522 || s === 524) {
+        return {
+          tone: "border-danger-500/30 bg-danger-500/10 text-danger-300",
+          title: "Request timed out",
+          body: "The server is taking too long to respond. Try again in a moment.",
+        }
+      }
+      if (s === 502 || s === 503 || s === 504) {
+        return {
+          tone: "border-danger-500/30 bg-danger-500/10 text-danger-300",
+          title: "Server isn’t ready yet",
+          body: "The server is starting up. Try again in a moment.",
+        }
+      }
       return {
         tone: "border-danger-500/30 bg-danger-500/10 text-danger-300",
         title: "Backend not reachable",
-        body: state.error ? `Last error: ${state.error}` : "Still trying? Check connection or retry in a moment.",
+        body: state.error ? `Last error: ${state.error}` : "Couldn’t reach the server. Try again in a moment.",
       }
     }
     return null
-  }, [state.status, state.error])
+  }, [state.status, state.error, state.httpStatus])
 
   if (!show || !copy) return null
 

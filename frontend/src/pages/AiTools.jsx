@@ -83,11 +83,7 @@ export default function AiTools() {
     refreshResumes()
   }, [online])
 
-  const resumesById = useMemo(() => {
-    const map = new Map()
-    for (const r of resumes) map.set(r.resumeId, r)
-    return map
-  }, [resumes])
+  // (removed) resumesById was unused
 
   return (
     <div className="space-y-6">
@@ -331,7 +327,7 @@ function ResumeMatcher({ online, onSavedResume }) {
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: `conic-gradient(#6366f1 ${scorePct * 3.6}deg, #334155 0deg)`,
+                    background: `conic-gradient(#3457b8 ${scorePct * 3.6}deg, #334155 0deg)`,
                   }}
                 />
                 <div className="absolute inset-2 rounded-full bg-dark-800 flex items-center justify-center">

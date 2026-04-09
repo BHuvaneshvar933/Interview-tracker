@@ -8,6 +8,7 @@ import { getApplication } from "../repo/applicationsRepo"
 import { getToken } from "../utils/auth"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
+import { toUserMessage } from "../utils/errorMessage"
 import RemindersPanel from "../components/RemindersPanel"
 
 // Icons
@@ -128,7 +129,7 @@ function ApplicationDetail() {
         location: res.data.location || "",
       })
     } catch (err) {
-      setError(err?.message || "Failed to load application")
+      setError(toUserMessage(err, "Couldn't load this application. Please try again."))
     } finally {
       setLoading(false)
     }
@@ -157,7 +158,7 @@ function ApplicationDetail() {
       setToast({ open: true, message: "Application deleted.", tone: "success" })
       navigate("/job-tracker")
     } catch {
-      setToast({ open: true, message: "Could not delete application. Please try again.", tone: "error" })
+      setToast({ open: true, message: "Couldn't delete the application. Please try again.", tone: "error" })
     }
   }
 
@@ -171,7 +172,7 @@ function ApplicationDetail() {
       await loadApplication()
       setToast({ open: true, message: "Application updated.", tone: "success" })
     } catch (err) {
-      setToast({ open: true, message: "Could not update application. Please try again.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(err, "Couldn't save changes. Please try again."), tone: "error" })
     }
   }
 
@@ -185,7 +186,7 @@ function ApplicationDetail() {
       await loadApplication()
       setToast({ open: true, message: "Interview added.", tone: "success" })
     } catch (err) {
-      setToast({ open: true, message: "Could not add interview. Please try again.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(err, "Couldn't add the interview. Please try again."), tone: "error" })
     } finally {
       setInterviewSubmitting(false)
     }

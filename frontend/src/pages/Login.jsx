@@ -3,6 +3,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom"
 import api from "../api/axios"
 import { getToken, setToken } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
+import { toUserMessage } from "../utils/errorMessage"
 
 const BriefcaseIcon = () => (
   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,11 +65,7 @@ function Login() {
       const to = location.state?.from || "/dashboard"
       navigate(to)
     } catch (err) {
-      if (!err?.response) {
-        setError("Can't reach the server right now. Check your connection (or wake the backend) and try again.")
-      } else {
-        setError(err.response?.data?.message || "Sign-in failed. Please try again.")
-      }
+      setError(toUserMessage(err, "Sign-in failed. Please try again."))
     } finally {
       setLoading(false)
     }

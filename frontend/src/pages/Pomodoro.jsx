@@ -66,7 +66,7 @@ const ChevronRightIcon = () => (
   </svg>
 )
 
-const PIE_COLORS = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4", "#a855f7", "#ec4899"]
+const PIE_COLORS = ["#3457b8", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4", "#a855f7", "#ec4899"]
 
 function clamp(n, min, max) {
   const x = Number(n)
@@ -284,7 +284,6 @@ export default function Pomodoro() {
     endAtRef.current = null
 
     const m = modeRef.current
-    const idx = modeIndexRef.current
     const s = settingsRef.current
     const isWork = m?.id === "work"
 
@@ -501,8 +500,8 @@ export default function Pomodoro() {
                 <svg viewBox="0 0 200 200" className="w-full h-full">
                   <defs>
                     <linearGradient id="workGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#818cf8" />
+                      <stop offset="0%" stopColor="#3457b8" />
+                      <stop offset="100%" stopColor="#5b78d6" />
                     </linearGradient>
                   </defs>
                   <circle cx="100" cy="100" r={ring.radius} stroke="rgba(51,65,85,0.85)" strokeWidth="12" fill="none" />

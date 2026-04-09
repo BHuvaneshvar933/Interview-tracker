@@ -37,11 +37,15 @@ function dispatchWakeEvent(detail) {
   }
 }
 
-function errorSummary(e) {
+function errorInfo(e) {
   const status = e?.response?.status
   const msg = e?.response?.data?.message || e?.message
-  if (status) return `${status}${msg ? `: ${String(msg)}` : ""}`
-  return msg ? String(msg) : "Request failed"
+  const code = e?.code
+  return {
+    status: status ? Number(status) : 0,
+    code: code ? String(code) : "",
+    message: msg ? String(msg) : "",
+  }
 }
 
 function sleep(ms) {
@@ -71,24 +75,43 @@ export async function warmUpBackend({ force = false, reason = "" } = {}) {
       dispatchWakeEvent({ status: "starting", reason, attempt: i + 1, startedAt })
 
       try {
-        const res = await wakeClient.get("/test", { params: { t: Date.now() } })
-        if (typeof res?.data === "string" || res?.status === 200) {
+        const res = await wakeClient.get("/test", {
+          params: { t: Date.now() },
+          // Treat non-2xx as a response (server is reachable).
+          validateStatus: () => true,
+        })
+
+        // If we get any 2xx-4xx, the server is awake.
+        // Keep retrying for 5xx since it can mean "booting".
+        if (res?.status >= 200 && res?.status < 500) {
           lastWakeOkAt = Date.now()
-          dispatchWakeEvent({ status: "ready", reason, attempt: i + 1, startedAt, finishedAt: lastWakeOkAt })
+          dispatchWakeEvent({ status: "ready", reason, attempt: i + 1, startedAt, finishedAt: lastWakeOkAt, httpStatus: res.status })
           return { ok: true }
         }
+
+        lastErr = { response: { status: res?.status, data: res?.data } }
       } catch (e) {
         lastErr = e
       }
 
       // stop retrying if browser reports offline mid-wake
       if (typeof navigator !== "undefined" && navigator.onLine === false) {
-        dispatchWakeEvent({ status: "failed", reason, attempt: i + 1, startedAt, offline: true, error: errorSummary(lastErr) })
+        const info = errorInfo(lastErr)
+        dispatchWakeEvent({
+          status: "failed",
+          reason,
+          attempt: i + 1,
+          startedAt,
+          offline: true,
+          error: info.message,
+          httpStatus: info.status,
+        })
         return { ok: false, offline: true, error: lastErr }
       }
     }
 
-    dispatchWakeEvent({ status: "failed", reason, attempt: delays.length, startedAt, error: errorSummary(lastErr) })
+    const info = errorInfo(lastErr)
+    dispatchWakeEvent({ status: "failed", reason, attempt: delays.length, startedAt, error: info.message, httpStatus: info.status })
     return { ok: false, error: lastErr }
   })()
 

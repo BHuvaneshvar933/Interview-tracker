@@ -6,17 +6,18 @@ export default {
       colors: {
         // Primary brand colors
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          // Premium navy-indigo (less vibrant than default indigo)
+          50: '#f2f5ff',
+          100: '#e7ecff',
+          200: '#d1dcff',
+          300: '#aec0f5',
+          400: '#5b78d6',
+          500: '#3457b8',
+          600: '#2a4696',
+          700: '#223a7c',
+          800: '#1b2f66',
+          900: '#162655',
+          950: '#0c1530',
         },
         // Dark theme backgrounds
         dark: {
@@ -71,8 +72,8 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
-        'glow-lg': '0 0 40px rgba(99, 102, 241, 0.4)',
+        'glow': '0 0 20px rgba(52, 87, 184, 0.28)',
+        'glow-lg': '0 0 40px rgba(52, 87, 184, 0.38)',
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
         'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.05)',
@@ -125,7 +126,7 @@ export default {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'mesh-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'mesh-gradient': 'linear-gradient(135deg, #3457b8 0%, #1b2f66 100%)',
         'dark-gradient': 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
       },
       borderRadius: {

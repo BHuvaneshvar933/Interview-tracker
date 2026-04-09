@@ -5,6 +5,7 @@ import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
 import RemindersPanel from "../components/RemindersPanel"
+import { toUserMessage } from "../utils/errorMessage"
 
 const PlusIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +201,7 @@ export default function Todos() {
       }
       setKnownCategories(Array.from(nextCats))
     } catch (e) {
-      setError(e?.response?.data?.message || e?.message || "Failed to load todos")
+      setError(toUserMessage(e, "Couldn't load to-dos. Please try again."))
     } finally {
       setLoading(false)
     }
@@ -263,7 +264,7 @@ export default function Todos() {
       setShowNew(false)
       await load()
     } catch (e2) {
-      setToast({ open: true, message: e2?.response?.data?.message || e2?.message || "Could not create to-do.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(e2, "Couldn't create the to-do. Please try again."), tone: "error" })
     } finally {
       setSubmitting(false)
     }

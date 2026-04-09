@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { fetchProfessionalAnalytics } from "../api/analytics"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
+import { toUserMessage } from "../utils/errorMessage"
 
 import {
   BarChart,
@@ -60,8 +61,8 @@ const LoadingSpinner = () => (
 
 // Chart colors
 const COLORS = {
-  primary: '#6366f1',
-  primaryLight: '#818cf8',
+  primary: '#3457b8',
+  primaryLight: '#5b78d6',
   success: '#22c55e',
   warning: '#f59e0b',
   danger: '#ef4444',
@@ -70,7 +71,7 @@ const COLORS = {
   pink: '#ec4899',
 }
 
-const PIE_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4']
+const PIE_COLORS = ['#3457b8', '#22c55e', '#f59e0b', '#ef4444', '#a855f7', '#06b6d4']
 
 // Custom tooltip
 const CustomTooltip = ({ active, payload, label }) => {
@@ -78,8 +79,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   return (
     <div className="bg-dark-800 border border-dark-600 rounded-xl px-4 py-3 shadow-xl">
       <p className="text-dark-400 text-sm mb-1">{label}</p>
-      {payload.map((entry, index) => (
-        <p key={index} className="text-white font-semibold">
+      {payload.map((entry) => (
+        <p key={entry.dataKey || entry.name} className="text-white font-semibold">
           {entry.name}: {entry.value}
         </p>
       ))}
@@ -120,7 +121,7 @@ function Analytics() {
 
         setPro(res.data)
       } catch (e) {
-        setError("Failed to load analytics")
+        setError(toUserMessage(e, "Couldn't load analytics right now. Please try again."))
       } finally {
         setLoading(false)
       }
@@ -498,7 +499,7 @@ function Analytics() {
           <EmptyState message="No skill data extracted" />
         ) : (
           <div className="flex flex-wrap gap-3">
-            {(pro.topSkills || []).map((skill, index) => (
+            {(pro.topSkills || []).map((skill) => (
               <div 
                 key={skill.skill} 
                 className="flex items-center gap-2 px-4 py-2 bg-dark-700 rounded-xl"

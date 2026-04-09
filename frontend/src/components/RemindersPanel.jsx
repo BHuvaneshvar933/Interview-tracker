@@ -3,6 +3,7 @@ import { createReminder, deleteReminder, listReminders } from "../api/reminders"
 import Toast from "./Toast"
 import ConfirmDialog from "./ConfirmDialog"
 import { formatLocalDateTime, toInstantISOStringFromLocalInput, toLocalDatetimeInputValue } from "../utils/datetime"
+import { toUserMessage } from "../utils/errorMessage"
 
 const BellIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,7 +62,7 @@ export default function RemindersPanel({ applicationId, todoId }) {
           : all
       setItems(filtered)
     } catch (e) {
-      setError(e?.response?.data?.message || e?.message || "Failed to load reminders")
+      setError(toUserMessage(e, "Couldn't load reminders. Please try again."))
     } finally {
       setLoading(false)
     }
@@ -92,7 +93,7 @@ export default function RemindersPanel({ applicationId, todoId }) {
       setForm((f) => ({ ...f, message: "" }))
       await load()
     } catch (e2) {
-      setToast({ open: true, message: e2?.response?.data?.message || e2?.message || "Could not create reminder.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(e2, "Couldn't create the reminder. Please try again."), tone: "error" })
     } finally {
       setSubmitting(false)
     }
@@ -108,7 +109,7 @@ export default function RemindersPanel({ applicationId, todoId }) {
       setToast({ open: true, message: "Reminder deleted.", tone: "success" })
       await load()
     } catch (e) {
-      setToast({ open: true, message: e?.response?.data?.message || e?.message || "Could not delete reminder.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(e, "Couldn't delete the reminder. Please try again."), tone: "error" })
     }
   }
 

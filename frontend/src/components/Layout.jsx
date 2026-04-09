@@ -84,13 +84,29 @@ const CloseIcon = () => (
   </svg>
 )
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 function Layout({ children }) {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const online = useOnlineStatus()
   const token = getToken()
+
+  // Prevent background scroll when the mobile sidebar is open.
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    if (!sidebarOpen) return
+
+    const prevBodyOverflow = document.body.style.overflow
+    const prevHtmlOverflow = document.documentElement.style.overflow
+    document.body.style.overflow = "hidden"
+    document.documentElement.style.overflow = "hidden"
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow
+      document.documentElement.style.overflow = prevHtmlOverflow
+    }
+  }, [sidebarOpen])
 
   const handleLogout = () => {
     logout()
@@ -124,23 +140,25 @@ function Layout({ children }) {
   ]
 
   return (
-    <div className="min-h-screen bg-dark-900 flex">
+    <div className="min-h-dvh bg-transparent flex lg:h-dvh">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-dark-950/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onTouchMove={(e) => e.preventDefault()}
         />
       )}
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        w-72 bg-dark-800/50 backdrop-blur-xl border-r border-dark-700/50
-        transform transition-transform duration-300 ease-out
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="flex flex-col h-full">
+         fixed lg:static inset-y-0 left-0 z-50
+          w-72 bg-dark-800/45 backdrop-blur-xl border-r border-dark-700/60
+         h-dvh
+         transform transition-transform duration-300 ease-out
+         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+       `}>
+        <div className="flex flex-col h-full min-h-0">
           {/* Logo area */}
           <div className="p-6 border-b border-dark-700/50">
             <div className="flex items-center gap-3">
@@ -155,9 +173,9 @@ function Layout({ children }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {navGroups.map((group, gi) => (
-              <div key={group.title} className={gi === 0 ? "" : "pt-3"}>
+           <nav className="flex-1 min-h-0 p-4 space-y-2 overflow-y-auto overscroll-contain">
+             {navGroups.map((group, gi) => (
+               <div key={group.title} className={gi === 0 ? "" : "pt-3"}>
                 <p className="px-4 py-2 text-xs font-semibold text-dark-500 uppercase tracking-wider">
                   {group.title}
                 </p>
@@ -192,9 +210,9 @@ function Layout({ children }) {
       </aside>
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-screen min-w-0">
+      <div className="flex-1 flex flex-col min-h-dvh min-w-0 lg:min-h-0 lg:h-dvh">
         {/* Mobile header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-dark-800/80 backdrop-blur-xl border-b border-dark-700/50">
+        <header className="lg:hidden sticky top-0 z-30 bg-dark-800/55 backdrop-blur-xl border-b border-dark-700/60">
           <div className="flex items-center justify-between p-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -213,18 +231,20 @@ function Layout({ children }) {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden lg:min-h-0 lg:overflow-y-auto">
           {!online && (
             <div className="mb-4 px-4 py-3 rounded-2xl border border-warning-500/30 bg-warning-500/10 text-warning-300">
               Offline mode: showing cached applications and interviews.
               {!token && " (Read-only until you sign in again.)"}
             </div>
           )}
-          <BackendWakeBanner />
-          <div className="animate-fade-in">
-            {children}
+           <BackendWakeBanner />
+          <div className="animate-fade-in w-full">
+            <div className="w-full max-w-[1100px] 2xl:max-w-[1280px] mx-auto">
+              {children}
+            </div>
           </div>
-        </main>
+         </main>
       </div>
     </div>
   )

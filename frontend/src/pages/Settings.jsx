@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { getMe } from "../api/account"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
-import { getToken } from "../utils/auth"
 import { getSetting, removeSetting, setSetting } from "../db"
 import {
   fetchGitHubContributions90d,
@@ -14,6 +13,7 @@ import Heatmap90d from "../components/Heatmap90d"
 import PushToggle from "../components/PushToggle"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
+import { toUserMessage } from "../utils/errorMessage"
 
 const UserIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,12 +36,6 @@ const DatabaseIcon = () => (
   </svg>
 )
 
-const LogoutIcon = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-  </svg>
-)
-
 function isPwaLike() {
   if (typeof window === "undefined") return false
   // iOS Safari uses navigator.standalone; other browsers use display-mode media query.
@@ -50,14 +44,14 @@ function isPwaLike() {
 
 export default function Settings() {
   const online = useOnlineStatus()
-  const token = getToken()
+  // Note: token isn't needed here; sign-in/out handled globally.
 
   const [tab, setTab] = useState("account")
   const [meLoading, setMeLoading] = useState(false)
   const [meError, setMeError] = useState("")
   const [me, setMe] = useState(null)
   const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
-  const [confirmLogout, setConfirmLogout] = useState(false)
+  // Sign-out is handled from the main sidebar; keep Settings focused on preferences.
 
 
   const [ghUsername, setGhUsername] = useState("")
@@ -91,7 +85,7 @@ export default function Settings() {
       const res = await getMe()
       setMe(res.data)
     } catch (e) {
-      setMeError(e?.response?.data?.message || e?.message || "Could not load account")
+      setMeError(toUserMessage(e, "Couldn't load your account details. Please try again."))
     } finally {
       setMeLoading(false)
     }
@@ -145,15 +139,7 @@ export default function Settings() {
     }
   }, [tab])
 
-  const doLogout = () => {
-    try {
-      localStorage.removeItem("token")
-      setToast({ open: true, message: "Signed out.", tone: "success" })
-      window.location.href = "/"
-    } catch {
-      setToast({ open: true, message: "Could not sign out.", tone: "error" })
-    }
-  }
+  // (removed) sign out action
 
   const syncGitHub = async () => {
     const u = normalizeGitHubUsername(ghUsername)
@@ -188,7 +174,7 @@ export default function Settings() {
       setGhSyncedAt(iso)
       setToast({ open: true, message: "GitHub synced.", tone: "success" })
     } catch (e) {
-      setGhError(e?.message || "GitHub sync failed")
+      setGhError(toUserMessage(e, "Couldn't sync GitHub right now. Please try again."))
     } finally {
       setGhBusy(false)
     }
@@ -222,7 +208,7 @@ export default function Settings() {
       setLcSyncedAt(iso)
       setToast({ open: true, message: "LeetCode synced.", tone: "success" })
     } catch (e) {
-      setLcError(e?.message || "LeetCode sync failed")
+      setLcError(toUserMessage(e, "Couldn't sync LeetCode right now. Please try again."))
     } finally {
       setLcBusy(false)
     }
@@ -257,20 +243,6 @@ export default function Settings() {
     <div className="space-y-6">
       <Toast open={toast.open} message={toast.message} tone={toast.tone} onClose={() => setToast((t) => ({ ...t, open: false }))} />
       <ConfirmDialog
-        open={confirmLogout}
-        title="Sign out?"
-        message="You will need to sign in again to sync data. Offline cached viewing may still work."
-        confirmText="Sign out"
-        cancelText="Cancel"
-        tone="danger"
-        onCancel={() => setConfirmLogout(false)}
-        onConfirm={() => {
-          setConfirmLogout(false)
-          doLogout()
-        }}
-      />
-
-      <ConfirmDialog
         open={confirmClearIntegrations}
         title="Clear integrations?"
         message="This removes cached GitHub/LeetCode usernames and stats from this device."
@@ -292,10 +264,6 @@ export default function Settings() {
           <div className="flex items-center gap-2">
             <button type="button" onClick={refreshMe} className="btn-secondary">
               Refresh
-            </button>
-            <button type="button" onClick={() => setConfirmLogout(true)} className="btn-danger flex items-center gap-2">
-              <LogoutIcon />
-              Sign out
             </button>
           </div>
         </div>

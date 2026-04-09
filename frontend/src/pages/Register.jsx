@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import api from "../api/axios"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
+import { toUserMessage } from "../utils/errorMessage"
 
 const BriefcaseIcon = () => (
   <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,11 +77,7 @@ function Register() {
       setMessage("Account created successfully! Redirecting...")
       setTimeout(() => navigate("/"), 2000)
     } catch (err) {
-      if (!err?.response) {
-        setError("Can't reach the server right now. Check your connection (or wake the backend) and try again.")
-      } else {
-        setError(err.response?.data?.message || "Registration failed. Please try again.")
-      }
+      setError(toUserMessage(err, "Registration failed. Please try again."))
     } finally {
       setLoading(false)
     }

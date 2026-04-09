@@ -7,6 +7,7 @@ import { listApplications } from "../repo/applicationsRepo"
 import { getToken } from "../utils/auth"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
+import { toUserMessage } from "../utils/errorMessage"
  
 
 // Icons
@@ -200,7 +201,7 @@ function JobTracker() {
       setPage(0)
       loadApplications()
     } catch (err) {
-      setToast({ open: true, message: "Could not create application. Please try again.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(err, "Couldn't create the application. Please try again."), tone: "error" })
     } finally {
       setSubmitting(false)
     }
@@ -221,7 +222,7 @@ function JobTracker() {
       setToast({ open: true, message: "Application deleted.", tone: "success" })
       loadApplications()
     } catch {
-      setToast({ open: true, message: "Could not delete application. Please try again.", tone: "error" })
+      setToast({ open: true, message: "Couldn't delete the application. Please try again.", tone: "error" })
     }
   }
 

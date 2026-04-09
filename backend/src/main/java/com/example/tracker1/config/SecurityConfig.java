@@ -36,6 +36,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Public health/wake endpoint (used by the frontend to wake the backend)
+                        .requestMatchers("/test").permitAll()
                         .anyRequest().authenticated()
                 )
 

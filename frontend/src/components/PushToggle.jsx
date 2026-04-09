@@ -7,6 +7,7 @@ import {
   unsubscribeFromPush,
 } from "../push/push"
 import Toast from "./Toast"
+import { toUserMessage } from "../utils/errorMessage"
 
 export default function PushToggle() {
   const [supported, setSupported] = useState(false)
@@ -61,7 +62,7 @@ export default function PushToggle() {
         setToast({ open: true, message: "Notifications enabled.", tone: "success" })
       }
     } catch (e) {
-      setToast({ open: true, message: e?.message || "Could not update notification settings.", tone: "error" })
+      setToast({ open: true, message: toUserMessage(e, "Couldn't update notification settings. Please try again."), tone: "error" })
     } finally {
       setBusy(false)
     }
