@@ -10,6 +10,7 @@ import AiTools from "./pages/AiTools"
 import Settings from "./pages/Settings"
 import Todos from "./pages/Todos"
 import Pomodoro from "./pages/Pomodoro"
+import Habits from "./pages/Habits"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
 import { warmUpBackend } from "./api/axios"
@@ -52,6 +53,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/todos" element={<Todos />} />
           <Route path="/pomodoro" element={<Pomodoro />} />
+          <Route path="/habits" element={<Habits />} />
         </Route>
 
         {/* Catch all */}

@@ -34,10 +34,10 @@ function cellClass(count, tone) {
     return "bg-success-500/35 border-success-500/40"
   }
 
-  if (level === 1) return "bg-primary-500/10 border-primary-500/20"
-  if (level === 2) return "bg-primary-500/15 border-primary-500/25"
-  if (level === 3) return "bg-primary-500/25 border-primary-500/30"
-  return "bg-primary-500/35 border-primary-500/40"
+  if (level === 1) return "bg-teal-500/10 border-teal-500/18"
+  if (level === 2) return "bg-emerald-500/10 border-emerald-500/18"
+  if (level === 3) return "bg-emerald-500/16 border-emerald-500/22"
+  return "bg-emerald-500/22 border-emerald-500/26"
 }
 
 export default function Heatmap90d({ days, tone = "primary" }) {
@@ -69,8 +69,8 @@ export default function Heatmap90d({ days, tone = "primary" }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-3">
-        <div className="text-sm text-dark-400">Last 90 days</div>
-        <div className="text-sm text-dark-300">Total: <span className="text-white font-semibold">{total}</span></div>
+        <div className="text-sm text-textSecondary">Last 90 days</div>
+        <div className="text-sm text-textSecondary">Total: <span className="text-textPrimary font-semibold">{total}</span></div>
       </div>
 
       <div className="mt-3 overflow-x-auto">

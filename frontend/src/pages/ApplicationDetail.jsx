@@ -342,7 +342,7 @@ function ApplicationDetail() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
                 activeTab === tab.id
-                  ? "text-primary-400 border-primary-400"
+                  ? "text-emerald-300 border-emerald-400"
                   : "text-dark-400 border-transparent hover:text-white hover:border-dark-600"
               }`}
             >
@@ -458,7 +458,7 @@ function OverviewTab({ application }) {
             {application.extractedSkills.map((skill, index) => (
               <span
                 key={index}
-                className="px-3 py-1.5 bg-primary-500/10 text-primary-400 border border-primary-500/20 rounded-lg text-sm font-medium"
+                className="px-3 py-1.5 bg-emerald-500/10 text-emerald-200 border border-emerald-500/20 rounded-lg text-sm font-medium"
               >
                 {skill}
               </span>
@@ -612,7 +612,7 @@ function TimelineTab({ application }) {
 
   const getEventStyle = (type) => {
     switch (type) {
-      case 'applied': return 'bg-primary-500/20 border-primary-500 text-primary-400'
+      case 'applied': return 'bg-emerald-500/12 border-emerald-500/25 text-emerald-200'
       case 'interview': return 'bg-warning-500/20 border-warning-500 text-warning-400'
       case 'offer': return 'bg-success-500/20 border-success-500 text-success-400'
       case 'rejected': return 'bg-danger-500/20 border-danger-500 text-danger-400'

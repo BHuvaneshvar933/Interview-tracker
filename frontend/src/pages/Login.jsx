@@ -75,59 +75,12 @@ function Login() {
   }
 
   return (
-    <div className="min-h-dvh flex">
-      {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-12 flex-col justify-between relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl" />
+    <div className="min-h-dvh flex items-center justify-center p-8 bg-transparent">
+      <div className="w-full max-w-md animate-fade-in">
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <LogoMark className="w-12 h-12" />
+          <span className="text-2xl font-bold text-white">Capsule</span>
         </div>
-        
-        <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <LogoMark className="w-12 h-12" />
-              <span className="text-2xl font-bold text-white">Capsule</span>
-            </div>
-          </div>
-
-        <div className="relative z-10 space-y-6">
-          <h1 className="text-5xl font-bold text-white leading-tight">
-            Track Your Career Journey
-          </h1>
-          <p className="text-xl text-primary-100 max-w-md">
-            Organize applications, monitor progress, and land your dream job with powerful analytics and insights.
-          </p>
-          
-          <div className="flex gap-8 pt-8">
-            <div>
-              <div className="text-4xl font-bold text-white">500+</div>
-              <div className="text-primary-200 text-sm">Applications Tracked</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white">85%</div>
-              <div className="text-primary-200 text-sm">Interview Rate</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white">50+</div>
-              <div className="text-primary-200 text-sm">Offers Received</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 text-primary-200 text-sm">
-          &copy; 2024 Capsule. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-transparent">
-        <div className="w-full max-w-md animate-fade-in">
-          {/* Mobile logo */}
-           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-             <LogoMark className="w-12 h-12" />
-             <span className="text-2xl font-bold text-white">Capsule</span>
-           </div>
 
            <div className="text-center mb-10">
              <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
@@ -221,7 +174,7 @@ function Login() {
               Don't have an account?{" "}
               <Link 
                 to="/register" 
-                className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
+                className="text-emerald-300 hover:text-teal-200 font-medium transition-colors"
               >
                 Create account
               </Link>
@@ -234,7 +187,6 @@ function Login() {
               By signing in, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>
-        </div>
       </div>
     </div>
   )

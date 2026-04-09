@@ -163,7 +163,7 @@ function TabButton({ active, onClick, icon, children }) {
       onClick={onClick}
       className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
         active
-          ? "text-primary-400 border-primary-400"
+          ? "text-emerald-300 border-emerald-400"
           : "text-dark-400 border-transparent hover:text-white hover:border-dark-600"
       }`}
     >
@@ -195,7 +195,7 @@ function FileDrop({ file, setFile, disabled }) {
         disabled
           ? "border-dark-700 bg-dark-800/30 opacity-60"
           : dragOver
-            ? "border-primary-400 bg-primary-500/10"
+            ? "border-emerald-400 bg-emerald-500/10"
             : "border-dark-700 bg-dark-800/40 hover:border-dark-600"
       }`}
     >
@@ -378,7 +378,7 @@ function ResumeMatcher({ online, onSavedResume }) {
             <ul className="space-y-2">
               {result.analysis.suggestions.map((s, idx) => (
                 <li key={idx} className="text-dark-300 flex gap-2">
-                  <span className="text-primary-400">•</span>
+                  <span className="text-emerald-300">•</span>
                   <span>{s}</span>
                 </li>
               ))}
@@ -408,9 +408,9 @@ function ResumeMatcher({ online, onSavedResume }) {
 }
 
 function SkillCard({ title, skills, tone }) {
-  const border = tone === "danger" ? "border-danger-500/30" : "border-primary-500/30"
-  const bg = tone === "danger" ? "bg-danger-500/10" : "bg-primary-500/10"
-  const text = tone === "danger" ? "text-danger-300" : "text-primary-300"
+  const border = tone === "danger" ? "border-danger-500/30" : "border-emerald-500/25"
+  const bg = tone === "danger" ? "bg-danger-500/10" : "bg-emerald-500/10"
+  const text = tone === "danger" ? "text-danger-300" : "text-emerald-200"
 
   return (
     <div className={`card ${border} ${bg}`}>
@@ -622,7 +622,7 @@ function QuestionGroup({ title, questions, tone }) {
       ? "text-success-300"
       : tone === "warning"
         ? "text-warning-300"
-        : "text-primary-300"
+        : "text-emerald-200"
 
   return (
     <div className="card">

@@ -345,7 +345,7 @@ function JobTracker() {
           {/* Toggle advanced filters */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 ${showFilters ? 'bg-primary-500/20 border-primary-500/30' : ''}`}
+            className={`btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 ${showFilters ? 'bg-emerald-500/10 border-emerald-500/25' : ''}`}
           >
             <FilterIcon />
             <span>Filters</span>
@@ -402,6 +402,18 @@ function JobTracker() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Mobile: quick link under filters */}
+      <div className="sm:hidden">
+        <button
+          type="button"
+          className="btn-secondary w-full"
+          onClick={() => navigate("/analytics")}
+          aria-label="Open Analytics"
+        >
+          Analytics
+        </button>
       </div>
 
       {/* Applications Grid */}
@@ -464,7 +476,7 @@ function JobTracker() {
                 onClick={() => setPage(i)}
                 className={`w-10 h-10 rounded-xl font-medium transition-all ${
                   page === i
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-emerald-500 text-white'
                     : 'text-dark-400 hover:bg-dark-700'
                 }`}
               >
@@ -502,12 +514,12 @@ function ApplicationCard({ app, index, onDelete, onClick, online }) {
   return (
     <div
       onClick={onClick}
-      className="card cursor-pointer group animate-fade-in-up hover:border-primary-500/30"
+      className="card cursor-pointer group animate-fade-in-up hover:border-emerald-500/25"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-base sm:text-lg font-semibold text-white truncate group-hover:text-primary-400 transition-colors">
+          <h3 className="text-base sm:text-lg font-semibold text-textPrimary truncate group-hover:text-emerald-200 transition-colors">
             {app.company}
           </h3>
           <p className="text-sm sm:text-base text-dark-400 truncate">{app.role}</p>
@@ -552,7 +564,7 @@ function ApplicationCard({ app, index, onDelete, onClick, online }) {
             e.stopPropagation()
             onClick()
           }}
-          className="text-sm text-primary-400 hover:text-primary-300 font-medium flex items-center gap-1 transition-colors"
+          className="text-sm text-emerald-200 hover:text-teal-200 font-medium flex items-center gap-1 transition-colors"
         >
           View details
           <ArrowRightIcon />

@@ -4,34 +4,62 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors
+        // Premium productivity theme tokens (teal + green)
+        background: "rgb(11 18 32 / <alpha-value>)", // #0B1220
+        surface: "rgb(15 23 42 / <alpha-value>)", // #0F172A
+        surfaceAlt: "rgb(30 41 59 / <alpha-value>)", // #1E293B
+
+        textPrimary: "rgb(226 232 240 / <alpha-value>)", // #E2E8F0
+        textSecondary: "rgb(148 163 184 / <alpha-value>)", // #94A3B8
+        textMuted: "rgb(100 116 139 / <alpha-value>)", // #64748B
+
+        borderSubtle: "rgb(255 255 255 / <alpha-value>)",
+
+        // Primary actions (focus/active)
         primary: {
-          // Premium navy-indigo (less vibrant than default indigo)
-          50: '#f2f5ff',
-          100: '#e7ecff',
-          200: '#d1dcff',
-          300: '#aec0f5',
-          400: '#5b78d6',
-          500: '#3457b8',
-          600: '#2a4696',
-          700: '#223a7c',
-          800: '#1b2f66',
-          900: '#162655',
-          950: '#0c1530',
+          DEFAULT: "#22C55E",
+          50: "#F0FDF4",
+          100: "#DCFCE7",
+          200: "#BBF7D0",
+          300: "#86EFAC",
+          400: "#4ADE80",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D",
+          950: "#052E16",
         },
-        // Dark theme backgrounds
+
+        // Teal accent used in gradients and highlights
+        accent: {
+          DEFAULT: "#14B8A6",
+          50: "#F0FDFA",
+          100: "#CCFBF1",
+          200: "#99F6E4",
+          300: "#5EEAD4",
+          400: "#2DD4BF",
+          500: "#14B8A6",
+          600: "#0D9488",
+          700: "#0F766E",
+          800: "#115E59",
+          900: "#134E4A",
+          950: "#042F2E",
+        },
+
+        // Dark scale aligned to theme surfaces
         dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+          50: "#f8fafc",
+          100: "#f1f5f9",
+          200: "#e2e8f0",
+          300: "#cbd5e1",
+          400: "#94a3b8",
+          500: "#64748b",
+          600: "#475569",
+          700: "#334155",
+          800: "#1e293b",
+          900: "#0f172a",
+          950: "#0b1220",
         },
         // Accent colors for status
         success: {
@@ -65,15 +93,15 @@ export default {
           700: '#b91c1c',
         },
         // Legacy support
-        darkBg: "#0f172a",
-        cardBg: "#1e293b",
+        darkBg: "#0b1220",
+        cardBg: "#0f172a",
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       boxShadow: {
-        'glow': '0 0 20px rgba(52, 87, 184, 0.28)',
-        'glow-lg': '0 0 40px rgba(52, 87, 184, 0.38)',
+        'glow': '0 0 20px rgba(20, 184, 166, 0.22)',
+        'glow-lg': '0 0 40px rgba(34, 197, 94, 0.20)',
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
         'card-hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
         'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.05)',
@@ -126,14 +154,21 @@ export default {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'mesh-gradient': 'linear-gradient(135deg, #3457b8 0%, #1b2f66 100%)',
-        'dark-gradient': 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+        'mesh-gradient': 'linear-gradient(135deg, #22c55e 0%, #14b8a6 100%)',
+        'dark-gradient': 'linear-gradient(180deg, #0b1220 0%, #0f172a 55%, #0b1220 100%)',
       },
       borderRadius: {
         '4xl': '2rem',
       },
       backdropBlur: {
         xs: '2px',
+      },
+
+      // Ensure ring offset color utilities exist for theme tokens
+      ringOffsetColor: {
+        background: "#0B1220",
+        surface: "#0F172A",
+        surfaceAlt: "#1E293B",
       },
     },
   },

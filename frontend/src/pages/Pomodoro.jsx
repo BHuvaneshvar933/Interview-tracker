@@ -93,29 +93,11 @@ function parseTags(raw) {
 }
 
 function intensityClass(minutes) {
-  if (minutes > 180) return "bg-primary-500/35 border-primary-500/40"
-  if (minutes > 120) return "bg-primary-500/25 border-primary-500/30"
-  if (minutes > 60) return "bg-primary-500/15 border-primary-500/25"
-  if (minutes > 0) return "bg-primary-500/10 border-primary-500/20"
+  if (minutes > 180) return "bg-emerald-500/20 border-emerald-500/30"
+  if (minutes > 120) return "bg-teal-500/16 border-teal-500/25"
+  if (minutes > 60) return "bg-emerald-500/12 border-emerald-500/22"
+  if (minutes > 0) return "bg-teal-500/10 border-teal-500/18"
   return "bg-dark-800/30 border-dark-700"
-}
-
-function downloadText(filename, text, mime) {
-  const blob = new Blob([text], { type: mime || "text/plain" })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  URL.revokeObjectURL(url)
-}
-
-function csvEscape(value) {
-  const s = String(value ?? "")
-  if (/[\n\r,"]/.test(s)) return `"${s.replace(/"/g, '""')}"`
-  return s
 }
 
 export default function Pomodoro() {
@@ -201,30 +183,6 @@ export default function Pomodoro() {
     const items = await listPomodorosSince(sixtyDaysAgo)
     items.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     setRecentPomodoros(items)
-  }
-
-  const exportCsv = async () => {
-    await prunePomodorosOlderThan(60)
-    const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
-    const items = await listPomodorosSince(sixtyDaysAgo)
-    items.sort((a, b) => new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime())
-
-    const header = ["completedAt", "durationMin", "taskTitle", "tags"].join(",")
-    const rows = items
-      .filter((p) => p && p.type === "work")
-      .map((p) => {
-        const tags = Array.isArray(p.tags) ? p.tags.join("|") : ""
-        return [
-          csvEscape(p.completedAt || ""),
-          csvEscape(Number(p.duration) || 0),
-          csvEscape(p.taskTitle || ""),
-          csvEscape(tags),
-        ].join(",")
-      })
-
-    const content = [header, ...rows].join("\n")
-    const ts = new Date().toISOString().slice(0, 10)
-    downloadText(`capsule-pomodoro-${ts}.csv`, content, "text/csv")
   }
 
   useEffect(() => {
@@ -470,8 +428,8 @@ export default function Pomodoro() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           {/* Timer section keeps its card on all sizes */}
-          <div className="card flex flex-col items-center text-center">
-            <div className="w-full flex flex-col items-center justify-center gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="pomodoro-section flex flex-col items-center text-center">
+            <div className="py-8 sm:py-0 w-full flex flex-col items-center justify-center gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <div className="text-dark-400 text-sm">Mode</div>
                 <div className="text-white font-semibold text-lg">{mode.label}</div>
@@ -483,10 +441,10 @@ export default function Pomodoro() {
                     type="button"
                     disabled={isRunning}
                     onClick={() => setModeIndex(idx)}
-                    className={`w-full lg:w-auto min-h-[40px] px-2 py-2 rounded-xl border text-[12px] sm:text-sm leading-tight whitespace-nowrap truncate font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`w-full lg:w-auto min-h-[40px] px-2 py-2 rounded-none sm:rounded-xl border-b-2 sm:border-b-0 sm:border text-[12px] sm:text-sm leading-tight whitespace-nowrap truncate font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       idx === modeIndex
-                        ? "border-primary-500/40 bg-primary-500/10 text-primary-200"
-                        : "border-dark-700 bg-dark-800/40 text-dark-300 hover:text-white hover:border-dark-600"
+                        ? "border-emerald-400 sm:border-emerald-500/30 bg-transparent sm:bg-emerald-500/10 text-emerald-200"
+                        : "border-transparent sm:border-dark-700 bg-transparent sm:bg-dark-800/40 text-dark-400 sm:text-dark-300 hover:text-white sm:hover:border-dark-600"
                     }`}
                   >
                     {m.label}
@@ -557,7 +515,7 @@ export default function Pomodoro() {
                       <span
                         key={i}
                         className={`w-2.5 h-2.5 rounded-full border ${
-                          filled ? "bg-primary-400 border-primary-400" : "bg-dark-800 border-dark-600"
+                          filled ? "bg-emerald-400 border-emerald-400" : "bg-dark-800 border-dark-600"
                         }`}
                       />
                     )
@@ -568,7 +526,7 @@ export default function Pomodoro() {
           </div>
 
           {/* Session Label */}
-          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+          <div className="pomodoro-section">
             <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -621,8 +579,8 @@ export default function Pomodoro() {
             </div>
           </div>
 
-          {/* Today */}
-          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+          {/* Today (mobile/tablet). Desktop version is below Sessions. */}
+          <div className="pomodoro-section lg:hidden">
             <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -632,20 +590,13 @@ export default function Pomodoro() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
+                <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
                   <button
                     type="button"
                     onClick={refreshRecent}
                     className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center"
                   >
                     Refresh
-                  </button>
-                  <button
-                    type="button"
-                    onClick={exportCsv}
-                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center"
-                  >
-                    Export CSV
                   </button>
                   <button
                     type="button"
@@ -662,7 +613,7 @@ export default function Pomodoro() {
 
         <div className="space-y-6">
           {/* Calendar */}
-          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+          <div className="pomodoro-section">
             <div className="pt-2 pb-8 border-b border-dark-800/60 sm:pt-0 sm:pb-0 sm:border-0">
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-center sm:text-left">
@@ -709,7 +660,7 @@ export default function Pomodoro() {
                       disabled={!inRange}
                       onClick={() => setSelectedDate(dayStr)}
                       className={`h-10 rounded-xl border flex items-center justify-center transition-all ${intensityClass(minutes)} ${
-                        selected ? "ring-2 ring-primary-500/40" : "hover:border-dark-600"
+                        selected ? "ring-2 ring-emerald-500/35" : "hover:border-dark-600"
                       } ${!inRange ? "opacity-35 cursor-not-allowed" : ""}`}
                       title={`${dayStr} • ${minutes} min`}
                     >
@@ -722,7 +673,7 @@ export default function Pomodoro() {
           </div>
 
           {/* Sessions */}
-          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+          <div className="pomodoro-section">
             <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
               <div className="flex items-baseline justify-between gap-4">
                 <div>
@@ -741,7 +692,7 @@ export default function Pomodoro() {
                     const start = new Date(end.getTime() - (Number(p.duration) || 0) * 60 * 1000)
                     const time = `${start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}–${end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
                     return (
-                      <div key={p.id} className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3">
+                      <div key={p.id} className="border-b border-dark-800/60 py-3 sm:rounded-2xl sm:border sm:border-dark-700 sm:bg-dark-800/40 sm:px-4 sm:py-3">
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
                             <div className="text-white font-semibold break-words">{p.taskTitle || "(Untitled)"}</div>
@@ -766,6 +717,37 @@ export default function Pomodoro() {
                     )
                   })
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Today (desktop) */}
+          <div className="pomodoro-section hidden lg:block">
+            <div className="py-0">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Today</h3>
+                  <p className="text-dark-400 text-sm mt-1">
+                    You’ve completed {todayPoms.length} sessions ({todayMinutes} min) today.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={refreshRecent}
+                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center"
+                  >
+                    Refresh
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDangerOpen(true)}
+                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center text-danger-300 hover:text-danger-200"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </div>
           </div>

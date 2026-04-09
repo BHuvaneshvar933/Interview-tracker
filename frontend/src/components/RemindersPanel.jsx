@@ -129,7 +129,7 @@ export default function RemindersPanel({ applicationId, todoId }) {
 
       <div className="card">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-xl bg-primary-500/10 text-primary-400 border border-primary-500/20">
+          <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-200 border border-emerald-500/20">
             <BellIcon />
           </div>
           <div>

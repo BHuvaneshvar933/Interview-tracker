@@ -86,68 +86,13 @@ function Register() {
     }
   }
 
-  const features = [
-    "Track unlimited job applications",
-    "Powerful analytics & insights",
-    "Interview scheduling & notes",
-    "Skill extraction from job posts",
-    "Source tracking & performance",
-  ]
-
   return (
-    <div className="min-h-dvh flex">
-      {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-12 flex-col justify-between relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl" />
+    <div className="min-h-dvh flex items-center justify-center p-8 bg-transparent">
+      <div className="w-full max-w-md animate-fade-in">
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <LogoMark className="w-12 h-12" />
+          <span className="text-2xl font-bold text-white">Capsule</span>
         </div>
-        
-        <div className="relative z-10">
-            <div className="flex items-center gap-3">
-              <LogoMark className="w-12 h-12" />
-              <span className="text-2xl font-bold text-white">Capsule</span>
-            </div>
-          </div>
-
-        <div className="relative z-10 space-y-8">
-          <h1 className="text-5xl font-bold text-white leading-tight">
-            Start Your Success Story Today
-          </h1>
-          <p className="text-xl text-primary-100 max-w-md">
-            Join thousands of job seekers who've streamlined their job search with Capsule.
-          </p>
-          
-          <div className="space-y-4 pt-4">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="flex items-center gap-3 text-primary-100"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="p-1 bg-white/20 rounded-full">
-                  <CheckIcon />
-                </div>
-                <span>{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-10 text-primary-200 text-sm">
-          &copy; 2024 Capsule. All rights reserved.
-        </div>
-      </div>
-
-      {/* Right side - Register form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-transparent">
-        <div className="w-full max-w-md animate-fade-in">
-          {/* Mobile logo */}
-           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-             <LogoMark className="w-12 h-12" />
-             <span className="text-2xl font-bold text-white">Capsule</span>
-           </div>
 
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-white mb-2">Create your account</h2>
@@ -263,7 +208,7 @@ function Register() {
               Already have an account?{" "}
               <Link 
                 to="/" 
-                className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
+                className="text-emerald-300 hover:text-teal-200 font-medium transition-colors"
               >
                 Sign in
               </Link>
@@ -276,7 +221,6 @@ function Register() {
               By creating an account, you agree to our Terms of Service and Privacy Policy
             </p>
           </div>
-        </div>
       </div>
     </div>
   )

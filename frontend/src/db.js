@@ -12,10 +12,33 @@ const settingsStore = localforage.createInstance({
   description: "Local settings and cached integrations",
 })
 
+const habitsStore = localforage.createInstance({
+  name: "capsule",
+  storeName: "habits",
+  description: "Habits metadata",
+})
+
+const habitLogsStore = localforage.createInstance({
+  name: "capsule",
+  storeName: "habitLogs",
+  description: "Habits daily completion logs",
+})
+
 const INDEX_KEY = "pomodoros:index"
+
+const HABITS_INDEX_KEY = "habits:index"
+const HABITS_LOG_DAYS_KEY = "habits:logDays"
 
 function byIdKey(id) {
   return `pomodoros:byId:${id}`
+}
+
+function habitByIdKey(id) {
+  return `habits:byId:${id}`
+}
+
+function habitDayLogKey(dayKey) {
+  return `habits:log:${dayKey}`
 }
 
 function safeJsonParse(value, fallback) {
@@ -141,4 +164,204 @@ export async function setSetting(key, value) {
 
 export async function removeSetting(key) {
   return settingsStore.removeItem(key)
+}
+
+function sortByOrderThenCreated(a, b) {
+  const ao = Number(a?.order)
+  const bo = Number(b?.order)
+  if (!Number.isNaN(ao) && !Number.isNaN(bo) && ao !== bo) return ao - bo
+  return String(a?.createdAt || "").localeCompare(String(b?.createdAt || ""))
+}
+
+export async function ensureDefaultHabits() {
+  const idx = (await habitsStore.getItem(HABITS_INDEX_KEY)) || []
+  const ids = Array.isArray(idx) ? idx : []
+  if (ids.length > 0) return
+
+  const defaults = [
+    { name: "1 LeetCode Problem", icon: "\ud83d\udcbb" },
+    { name: "Revise 1 GATE Subject", icon: "\ud83c\udf93" },
+    { name: "Apply to 2 Jobs", icon: "\ud83d\udcbc" },
+    { name: "Read Tech Article", icon: "\ud83d\udcf0" },
+    { name: "Drink 8 Glasses Water", icon: "\ud83d\udca7" },
+    { name: "30 min Exercise", icon: "\ud83d\udcaa" },
+  ]
+
+  const nextIds = []
+  for (let i = 0; i < defaults.length; i++) {
+    const id = uuid()
+    const now = new Date().toISOString()
+    const item = {
+      id,
+      name: defaults[i].name,
+      icon: defaults[i].icon,
+      order: i,
+      createdAt: now,
+      updatedAt: now,
+    }
+    await habitsStore.setItem(habitByIdKey(id), item)
+    nextIds.push(id)
+  }
+
+  await habitsStore.setItem(HABITS_INDEX_KEY, nextIds)
+}
+
+export async function listHabits() {
+  const idx = (await habitsStore.getItem(HABITS_INDEX_KEY)) || []
+  const ids = Array.isArray(idx) ? idx : []
+  if (ids.length === 0) return []
+
+  const out = []
+  for (const id of ids) {
+    const item = await habitsStore.getItem(habitByIdKey(id))
+    if (item) out.push(item)
+  }
+  return out.sort(sortByOrderThenCreated)
+}
+
+export async function createHabit({ name, icon }) {
+  const id = uuid()
+  const now = new Date().toISOString()
+  const n = String(name || "").trim()
+  if (!n) throw new Error("Habit name is required")
+
+  const idx = (await habitsStore.getItem(HABITS_INDEX_KEY)) || []
+  const ids = Array.isArray(idx) ? idx : []
+
+  const item = {
+    id,
+    name: n,
+    icon: String(icon || "").trim(),
+    order: ids.length,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  await habitsStore.setItem(habitByIdKey(id), item)
+  await habitsStore.setItem(HABITS_INDEX_KEY, [...ids, id])
+  return item
+}
+
+export async function updateHabit(id, patch) {
+  const item = await habitsStore.getItem(habitByIdKey(id))
+  if (!item) throw new Error("Habit not found")
+
+  const next = {
+    ...item,
+    name: patch?.name != null ? String(patch.name).trim() : item.name,
+    icon: patch?.icon != null ? String(patch.icon).trim() : item.icon,
+    updatedAt: new Date().toISOString(),
+  }
+
+  if (!next.name) throw new Error("Habit name is required")
+  await habitsStore.setItem(habitByIdKey(id), next)
+  return next
+}
+
+async function ensureDayInLogIndex(dayKey) {
+  const raw = (await habitLogsStore.getItem(HABITS_LOG_DAYS_KEY)) || []
+  const days = Array.isArray(raw) ? raw : []
+  if (days.includes(dayKey)) return days
+  const next = [...days, dayKey]
+  await habitLogsStore.setItem(HABITS_LOG_DAYS_KEY, next)
+  return next
+}
+
+async function removeDayFromLogIndex(dayKey) {
+  const raw = (await habitLogsStore.getItem(HABITS_LOG_DAYS_KEY)) || []
+  const days = Array.isArray(raw) ? raw : []
+  if (!days.includes(dayKey)) return days
+  const next = days.filter((d) => d !== dayKey)
+  await habitLogsStore.setItem(HABITS_LOG_DAYS_KEY, next)
+  return next
+}
+
+export async function getHabitDayLog(dayKey) {
+  const key = habitDayLogKey(dayKey)
+  const log = await habitLogsStore.getItem(key)
+  return log && typeof log === "object" ? log : {}
+}
+
+export async function setHabitDoneForDay(dayKey, habitId, done) {
+  const key = habitDayLogKey(dayKey)
+  const prev = (await habitLogsStore.getItem(key)) || {}
+  const log = prev && typeof prev === "object" ? { ...prev } : {}
+
+  if (done) log[habitId] = true
+  else delete log[habitId]
+
+  const hasAny = Object.keys(log).length > 0
+  if (!hasAny) {
+    await habitLogsStore.removeItem(key)
+    await removeDayFromLogIndex(dayKey)
+    return {}
+  }
+
+  await habitLogsStore.setItem(key, log)
+  await ensureDayInLogIndex(dayKey)
+  return log
+}
+
+export async function toggleHabitDoneForDay(dayKey, habitId) {
+  const log = await getHabitDayLog(dayKey)
+  const nextDone = !log[habitId]
+  return setHabitDoneForDay(dayKey, habitId, nextDone)
+}
+
+export async function listHabitLogsForDays(dayKeys) {
+  const out = {}
+  const keys = Array.isArray(dayKeys) ? dayKeys : []
+  for (const dayKey of keys) {
+    // eslint-disable-next-line no-await-in-loop
+    out[dayKey] = await getHabitDayLog(dayKey)
+  }
+  return out
+}
+
+export async function deleteHabit(id) {
+  await habitsStore.removeItem(habitByIdKey(id))
+  const idx = (await habitsStore.getItem(HABITS_INDEX_KEY)) || []
+  const ids = Array.isArray(idx) ? idx : []
+  const nextIds = ids.filter((x) => x !== id)
+  await habitsStore.setItem(HABITS_INDEX_KEY, nextIds)
+
+  const rawDays = (await habitLogsStore.getItem(HABITS_LOG_DAYS_KEY)) || []
+  const days = Array.isArray(rawDays) ? rawDays : []
+  const keptDays = []
+
+  for (const dayKey of days) {
+    // eslint-disable-next-line no-await-in-loop
+    const key = habitDayLogKey(dayKey)
+    // eslint-disable-next-line no-await-in-loop
+    const prev = (await habitLogsStore.getItem(key)) || {}
+    const log = prev && typeof prev === "object" ? { ...prev } : {}
+    if (log[id] == null) {
+      keptDays.push(dayKey)
+      continue
+    }
+    delete log[id]
+    if (Object.keys(log).length === 0) {
+      // eslint-disable-next-line no-await-in-loop
+      await habitLogsStore.removeItem(key)
+      continue
+    }
+    // eslint-disable-next-line no-await-in-loop
+    await habitLogsStore.setItem(key, log)
+    keptDays.push(dayKey)
+  }
+
+  await habitLogsStore.setItem(HABITS_LOG_DAYS_KEY, keptDays)
+}
+
+export async function clearHabits() {
+  await Promise.all([
+    habitsStore.clear(),
+    habitLogsStore.clear(),
+  ])
+}
+
+export async function resetHabitsToDefaults() {
+  await clearHabits()
+  await ensureDefaultHabits()
+  return listHabits()
 }

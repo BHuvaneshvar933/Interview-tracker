@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { ChevronLeft, MoreVertical, Settings } from "lucide-react"
+import { ChevronLeft, MoreVertical } from "lucide-react"
 import Button from "./ui/Button"
 
 const CAPSULE_CORP_LOGO_URL = "/capsule-corp.svg"
@@ -11,6 +11,7 @@ function titleForPath(pathname) {
   if (pathname.startsWith("/job-tracker")) return "Job Tracker"
   if (pathname.startsWith("/todos")) return "To-dos"
   if (pathname.startsWith("/pomodoro")) return "Pomodoro"
+  if (pathname.startsWith("/habits")) return "Habits"
   if (pathname.startsWith("/analytics")) return "Analytics"
   if (pathname.startsWith("/ai")) return "AI Tools"
   if (pathname.startsWith("/settings")) return "Settings"
@@ -30,7 +31,7 @@ export default function TopBar({ onOpenMore, actions }) {
   const showBack = useMemo(() => {
     const p = location.pathname
     if (p === "/" || p.startsWith("/register")) return false
-    const tabRoots = ["/dashboard", "/job-tracker", "/todos", "/pomodoro", "/settings"]
+    const tabRoots = ["/dashboard", "/job-tracker", "/todos", "/pomodoro", "/habits", "/settings"]
     const isTab = tabRoots.some((t) => p === t || p.startsWith(t + "/"))
     return !isTab
   }, [location.pathname])
@@ -45,7 +46,7 @@ export default function TopBar({ onOpenMore, actions }) {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl text-dark-200 hover:text-white hover:bg-dark-800/60 transition-all duration-200 active:scale-[0.98]"
+                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl text-textSecondary hover:text-textPrimary hover:bg-surfaceAlt/60 transition-all duration-200 active:scale-[0.98]"
                   aria-label="Back"
                 >
                   <ChevronLeft className="w-5 h-5" />
@@ -54,7 +55,7 @@ export default function TopBar({ onOpenMore, actions }) {
                 <button
                   type="button"
                   onClick={() => navigate(isPublic ? "/" : "/dashboard")}
-                  className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:bg-dark-800/40 transition-all duration-200 active:scale-[0.98]"
+                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:bg-surfaceAlt/40 transition-all duration-200 active:scale-[0.98]"
                   aria-label="Home"
                 >
                   <img
@@ -67,7 +68,7 @@ export default function TopBar({ onOpenMore, actions }) {
               )}
 
               <div className="min-w-0">
-                <div className="text-[11px] text-dark-400">Capsule</div>
+                <div className="text-[11px] text-textMuted">Capsule</div>
                 <div className="text-base font-semibold text-white truncate">{title}</div>
               </div>
             </div>
@@ -76,15 +77,6 @@ export default function TopBar({ onOpenMore, actions }) {
               {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
               {!isPublic ? (
                 <>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="px-3 rounded-2xl"
-                    onClick={() => navigate("/settings")}
-                    aria-label="Settings"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </Button>
                   <Button
                     variant="secondary"
                     size="sm"

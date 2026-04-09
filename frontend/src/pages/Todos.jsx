@@ -56,7 +56,7 @@ function ChipGroup({ value, onChange, options }) {
             onClick={() => onChange(opt.value)}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               active
-                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/20"
+                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/15"
                 : "text-dark-300 hover:text-white hover:bg-dark-800/60"
             }`}
           >
@@ -406,7 +406,7 @@ export default function Todos() {
             <div
               key={t.id}
               id={`todo-${t.id}`}
-              className={`card hover:border-dark-600 ${t.id === openRemindersForId ? "ring-1 ring-primary-500/40" : ""}`}
+              className={`card hover:border-white/15 ${t.id === openRemindersForId ? "ring-1 ring-emerald-500/30" : ""}`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
@@ -442,7 +442,7 @@ export default function Todos() {
                         </span>
                       )}
                       {t.category ? (
-                        <span className="text-xs px-2.5 py-1 rounded-full border border-primary-500/20 bg-primary-500/10 text-primary-300">
+                        <span className="text-xs px-2.5 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-200">
                           {t.category}
                         </span>
                       ) : null}
@@ -457,7 +457,7 @@ export default function Todos() {
                       setOpenRemindersForId(t.id)
                       updateQueryParam("todoId", t.id)
                     }}
-                    className="btn-ghost text-primary-300 flex items-center justify-center"
+                    className="btn-ghost text-emerald-200 flex items-center justify-center"
                     aria-label="Remind me"
                     title="Remind me"
                   >

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { getMe } from "../api/account"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getSetting, removeSetting, setSetting } from "../db"
@@ -39,12 +39,6 @@ const DatabaseIcon = () => (
   </svg>
 )
 
-function isPwaLike() {
-  if (typeof window === "undefined") return false
-  // iOS Safari uses navigator.standalone; other browsers use display-mode media query.
-  return window.matchMedia?.("(display-mode: standalone)")?.matches || window.navigator?.standalone
-}
-
 export default function Settings() {
   const online = useOnlineStatus()
   const isMobile = useMediaQuery("(max-width: 768px)")
@@ -54,6 +48,7 @@ export default function Settings() {
   const [meLoading, setMeLoading] = useState(false)
   const [meError, setMeError] = useState("")
   const [me, setMe] = useState(null)
+  const [meFetchedAt, setMeFetchedAt] = useState("")
   const [toast, setToast] = useState({ open: false, message: "", tone: "error" })
   // Sign-out is handled from the main sidebar; keep Settings focused on preferences.
 
@@ -73,14 +68,6 @@ export default function Settings() {
 
   const [confirmClearIntegrations, setConfirmClearIntegrations] = useState(false)
 
-  const env = useMemo(() => {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
-    return {
-      apiBase,
-      pwa: isPwaLike(),
-    }
-  }, [])
-
   const refreshMe = async () => {
     if (!online) return
     try {
@@ -88,6 +75,7 @@ export default function Settings() {
       setMeError("")
       const res = await getMe()
       setMe(res.data)
+      setMeFetchedAt(new Date().toISOString())
     } catch (e) {
       setMeError(toUserMessage(e, "Couldn't load your account details. Please try again."))
     } finally {
@@ -311,7 +299,7 @@ export default function Settings() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-semibold text-white">Profile</h2>
-                <p className="text-dark-400 text-sm mt-1">Basic account information from the server</p>
+                <p className="text-dark-400 text-sm mt-1">Basic information</p>
               </div>
               <div className={`text-xs px-2.5 py-1 rounded-full border ${online ? "border-success-500/30 bg-success-500/10 text-success-300" : "border-warning-500/30 bg-warning-500/10 text-warning-300"}`}>
                 {online ? "Online" : "Offline"}
@@ -320,8 +308,10 @@ export default function Settings() {
 
             <div className="mt-6 grid sm:grid-cols-2 gap-4">
               <InfoField label="Email" value={me?.email || (meLoading ? "Loading…" : meError ? "—" : "—")} />
-              <InfoField label="Role" value={me?.role || "—"} />
-              <InfoField label="PWA Mode" value={env.pwa ? "Installed" : "Browser"} />
+              <InfoField
+                label="Last updated"
+                value={meFetchedAt ? new Date(meFetchedAt).toLocaleString() : meLoading ? "Loading…" : "—"}
+              />
             </div>
 
             {meError && <div className="mt-4 text-danger-300 text-sm">{meError}</div>}
@@ -498,7 +488,7 @@ function TabButton({ active, onClick, icon, children }) {
       onClick={onClick}
       className={`flex items-center gap-2 px-3 sm:px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all ${
         active
-          ? "text-primary-400 border-primary-400"
+          ? "text-emerald-300 border-emerald-400"
           : "text-dark-400 border-transparent hover:text-white hover:border-dark-600"
       }`}
     >

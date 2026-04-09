@@ -21,13 +21,13 @@ export default function Button({
 
   const variants = {
     primary:
-      "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/15 " +
-      "hover:from-primary-400 hover:to-primary-600 hover:shadow-glow",
+      "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/15 " +
+      "hover:from-emerald-400 hover:to-teal-400 hover:shadow-glow",
     secondary:
-      "bg-dark-800/70 text-white border border-dark-700/70 shadow-inner-light " +
-      "hover:bg-dark-700/70 hover:border-dark-600",
+      "bg-surfaceAlt/60 text-textPrimary border border-white/10 shadow-inner-light " +
+      "hover:bg-surfaceAlt/75 hover:border-white/15",
     ghost:
-      "bg-transparent text-dark-100 hover:bg-dark-800/60 border border-transparent hover:border-dark-700/60",
+      "bg-transparent text-textSecondary hover:text-textPrimary hover:bg-surfaceAlt/60 border border-transparent hover:border-white/10",
     danger:
       "bg-danger-600 text-white hover:bg-danger-700 shadow-lg shadow-danger-500/15",
   }
