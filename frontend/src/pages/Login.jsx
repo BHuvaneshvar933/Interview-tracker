@@ -72,7 +72,7 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-dvh flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-12 flex-col justify-between relative overflow-hidden">
         {/* Background decorations */}
@@ -120,20 +120,20 @@ function Login() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-dark-900">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-transparent">
         <div className="w-full max-w-md animate-fade-in">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
             <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg shadow-primary-500/30">
               <BriefcaseIcon />
             </div>
             <span className="text-2xl font-bold text-white">Capsule</span>
           </div>
 
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
-            <p className="text-dark-400">Sign in to continue to your dashboard</p>
-          </div>
+           <div className="text-center mb-10">
+             <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>
+             <p className="text-dark-400">Sign in to continue</p>
+           </div>
 
           {error && (
             <div className="mb-6 p-4 bg-danger-500/10 border border-danger-500/30 rounded-xl animate-fade-in-down">

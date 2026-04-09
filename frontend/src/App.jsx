@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import Dashboard from "./pages/Dashboard"
@@ -13,108 +13,46 @@ import Pomodoro from "./pages/Pomodoro"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Layout from "./components/Layout"
 import { warmUpBackend } from "./api/axios"
+import { useMediaQuery } from "./hooks/useMediaQuery"
+import AppLayout from "./mobile/AppLayout"
+import AuthLayout from "./mobile/AuthLayout"
 
 function App() {
+  const isMobile = useMediaQuery("(max-width: 768px)")
+
   useEffect(() => {
     // Render free tier cold starts: attempt a gentle warm-up on load.
     warmUpBackend({ reason: "startup" })
   }, [])
 
+  const Shell = isMobile ? AppLayout : Layout
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/" element={isMobile ? <AuthLayout><Login /></AuthLayout> : <Login />} />
+        <Route path="/register" element={isMobile ? <AuthLayout><Register /></AuthLayout> : <Register />} />
 
-        {/* Protected routes with Layout */}
+        {/* Protected routes share a single shell (mobile/desktop) */}
         <Route
-          path="/dashboard"
           element={
             <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
+              <Shell>
+                <Outlet />
+              </Shell>
             </ProtectedRoute>
           }
-        />
-
-        <Route
-          path="/job-tracker"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <JobTracker />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/applications/:id"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ApplicationDetail />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Analytics />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/ai"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <AiTools />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Settings />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/todos"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Todos />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/pomodoro"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <Pomodoro />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/job-tracker" element={<JobTracker />} />
+          <Route path="/applications/:id" element={<ApplicationDetail />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/ai" element={<AiTools />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/todos" element={<Todos />} />
+          <Route path="/pomodoro" element={<Pomodoro />} />
+        </Route>
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/" replace />} />

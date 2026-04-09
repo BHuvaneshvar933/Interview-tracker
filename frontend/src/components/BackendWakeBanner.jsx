@@ -71,7 +71,7 @@ export default function BackendWakeBanner() {
       }
       return {
         tone: "border-danger-500/30 bg-danger-500/10 text-danger-300",
-        title: "Backend not reachable",
+        title: "Server not reachable",
         body: state.error ? `Last error: ${state.error}` : "Couldn’t reach the server. Try again in a moment.",
       }
     }

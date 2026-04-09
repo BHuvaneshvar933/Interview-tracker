@@ -12,6 +12,11 @@ body {
   overflow-x: hidden;
 }
 
+/* Avoid horizontal layout jitter from 100vw/scrollbars */
+body {
+  max-width: 100%;
+}
+
 #root {
   width: 100%;
 }

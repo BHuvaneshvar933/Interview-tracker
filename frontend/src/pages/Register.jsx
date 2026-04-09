@@ -92,7 +92,7 @@ function Register() {
   ]
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-dvh flex">
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 p-12 flex-col justify-between relative overflow-hidden">
         {/* Background decorations */}
@@ -140,10 +140,10 @@ function Register() {
       </div>
 
       {/* Right side - Register form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-dark-900">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-transparent">
         <div className="w-full max-w-md animate-fade-in">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-12">
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
             <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg shadow-primary-500/30">
               <BriefcaseIcon />
             </div>

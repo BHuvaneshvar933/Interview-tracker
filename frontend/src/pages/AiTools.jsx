@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { toUserMessage } from "../utils/errorMessage"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 import {
   analyzeResume,
@@ -61,6 +63,20 @@ export default function AiTools() {
   const online = useOnlineStatus()
   const [tab, setTab] = useState("matcher")
 
+  useTopBarActions(
+    <Button
+      variant="secondary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      disabled={!online}
+      onClick={() => setTab("matcher")}
+      aria-label="Resume matcher"
+    >
+      Matcher
+    </Button>,
+    [online]
+  )
+
   const [resumesLoading, setResumesLoading] = useState(true)
   const [resumesError, setResumesError] = useState("")
   const [resumes, setResumes] = useState([])
@@ -87,7 +103,7 @@ export default function AiTools() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="hidden sm:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-white">AI Tools</h1>
           <p className="text-dark-400 mt-1">Resume matching, interview prep, and vector search</p>

@@ -8,6 +8,8 @@ import { getToken } from "../utils/auth"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
 import { toUserMessage } from "../utils/errorMessage"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
  
 
 // Icons
@@ -103,6 +105,21 @@ function JobTracker() {
   const navigate = useNavigate()
   const online = useOnlineStatus()
   const token = getToken()
+
+  useTopBarActions(
+    <Button
+      variant="primary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      disabled={!online}
+      onClick={() => setShowModal(true)}
+      aria-label="New Application"
+    >
+      <PlusIcon />
+      New
+    </Button>,
+    [online]
+  )
 
 
   const [formData, setFormData] = useState({
@@ -273,8 +290,8 @@ function JobTracker() {
           Offline read-only mode. Some actions are disabled until you sign in again.
         </div>
       )}
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Desktop header (mobile uses TopBar action) */}
+      <div className="hidden sm:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-white">Job Tracker</h1>
           <p className="text-dark-400 mt-1">Track and manage your job applications</p>

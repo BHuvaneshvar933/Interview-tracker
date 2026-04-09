@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Pie, PieChart, ResponsiveContainer, Cell } from "recharts"
 
 import { formatTimer } from "../helpers"
 import {
@@ -10,6 +9,8 @@ import {
   prunePomodorosOlderThan,
   setPomodoroSettings,
 } from "../db"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 const GearIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,8 +67,6 @@ const ChevronRightIcon = () => (
   </svg>
 )
 
-const PIE_COLORS = ["#3457b8", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4", "#a855f7", "#ec4899"]
-
 function clamp(n, min, max) {
   const x = Number(n)
   if (Number.isNaN(x)) return min
@@ -123,6 +122,19 @@ export default function Pomodoro() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settings, setSettings] = useState(() => getPomodoroSettings())
   const [dangerOpen, setDangerOpen] = useState(false)
+
+  useTopBarActions(
+    <Button
+      variant="secondary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      onClick={() => setSettingsOpen(true)}
+      aria-label="Pomodoro Settings"
+    >
+      <GearIcon />
+    </Button>,
+    []
+  )
 
   const modes = useMemo(() => {
     const focus = clamp(settings.focus, 1, 300) * 60
@@ -413,19 +425,6 @@ export default function Pomodoro() {
     return list
   }, [recentPomodoros, selectedDate])
 
-  const topicData = useMemo(() => {
-    const map = new Map()
-    for (const p of displayPomodoros) {
-      const k = p.taskTitle || "(Untitled)"
-      map.set(k, (map.get(k) || 0) + (Number(p.duration) || 0))
-    }
-    const arr = Array.from(map.entries()).map(([name, value]) => ({ name, value }))
-    arr.sort((a, b) => b.value - a.value)
-    return arr
-  }, [displayPomodoros])
-
-  const selectedTotalMinutes = useMemo(() => topicData.reduce((s, x) => s + x.value, 0), [topicData])
-
   const monthDays = useMemo(() => {
     const year = monthCursor.getFullYear()
     const month = monthCursor.getMonth()
@@ -457,8 +456,8 @@ export default function Pomodoro() {
   }, [mode.seconds, timeLeft])
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-8">
+      <div className="hidden sm:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-white">Pomodoro</h1>
         </div>
@@ -468,22 +467,23 @@ export default function Pomodoro() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
-          <div className="card">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Timer section keeps its card on all sizes */}
+          <div className="card flex flex-col items-center text-center">
+            <div className="w-full flex flex-col items-center justify-center gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <div className="text-dark-400 text-sm">Mode</div>
                 <div className="text-white font-semibold text-lg">{mode.label}</div>
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-3 gap-1.5 w-full lg:w-auto lg:flex lg:gap-2">
                 {modes.map((m, idx) => (
                   <button
                     key={m.id}
                     type="button"
                     disabled={isRunning}
                     onClick={() => setModeIndex(idx)}
-                    className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                    className={`w-full lg:w-auto min-h-[40px] px-2 py-2 rounded-xl border text-[12px] sm:text-sm leading-tight whitespace-nowrap truncate font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       idx === modeIndex
                         ? "border-primary-500/40 bg-primary-500/10 text-primary-200"
                         : "border-dark-700 bg-dark-800/40 text-dark-300 hover:text-white hover:border-dark-600"
@@ -496,7 +496,7 @@ export default function Pomodoro() {
             </div>
 
             <div className="mt-8 flex items-center justify-center">
-              <div className="relative w-[220px] h-[220px]">
+              <div className="relative w-[220px] h-[220px] sm:w-[240px] sm:h-[240px]">
                 <svg viewBox="0 0 200 200" className="w-full h-full">
                   <defs>
                     <linearGradient id="workGrad" x1="0" y1="0" x2="1" y2="1">
@@ -525,7 +525,7 @@ export default function Pomodoro() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-center gap-3">
+            <div className="mt-8 w-full flex flex-col sm:flex-row sm:items-center justify-center gap-3">
               <button type="button" onClick={toggleRunning} className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
                 {isRunning ? <PauseIcon /> : <PlayIcon />}
                 {isRunning ? "Pause" : timeLeft < mode.seconds ? "Resume" : "Start"}
@@ -546,20 +546,18 @@ export default function Pomodoro() {
               </button>
             </div>
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 w-full flex flex-col items-center gap-2 lg:flex-row lg:items-center lg:justify-between">
               <div className="text-sm text-dark-400">Long break after</div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
                 <div className="text-white font-semibold">{Math.max(1, settings.sessionsCount)} focus sessions</div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center gap-1">
                   {Array.from({ length: Math.max(1, settings.sessionsCount) }).map((_, i) => {
                     const filled = i < (sessionsCompleted % Math.max(1, settings.sessionsCount))
                     return (
                       <span
                         key={i}
                         className={`w-2.5 h-2.5 rounded-full border ${
-                          filled
-                            ? "bg-primary-400 border-primary-400"
-                            : "bg-dark-800 border-dark-600"
+                          filled ? "bg-primary-400 border-primary-400" : "bg-dark-800 border-dark-600"
                         }`}
                       />
                     )
@@ -569,172 +567,174 @@ export default function Pomodoro() {
             </div>
           </div>
 
-          <div className="card">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-semibold text-white">Session Label</h3>
-                <p className="text-dark-400 text-sm mt-1">Tag what you’re focusing on (saved with the work log).</p>
-              </div>
-            </div>
-
-            <div className="mt-5 grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-2">Category</label>
-                <select
-                  value={taskCategory}
-                  onChange={(e) => setTaskCategory(e.target.value)}
-                  className="select-field"
-                >
-                  <option value="GATE">GATE</option>
-                  <option value="LeetCode">LeetCode</option>
-                  <option value="Project">Project</option>
-                  <option value="Reading">Reading</option>
-                  <option value="Others">Others (Custom)</option>
-                </select>
+          {/* Session Label */}
+          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+            <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Session Label</h3>
+                  <p className="text-dark-400 text-sm mt-1">Tag what you’re focusing on (saved with the work log).</p>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-2">Title</label>
-                {taskCategory === "Others" ? (
-                  <input
-                    value={taskTitle}
-                    onChange={(e) => setTaskTitle(e.target.value)}
-                    className="input-field"
-                    placeholder="e.g. System design notes"
-                  />
-                ) : (
-                  <div className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3 text-white font-semibold">
-                    {resolvedTitle()}
-                  </div>
-                )}
-                {taskCategory === "Others" && (
-                  <div className="text-xs text-dark-500 mt-2">Blank defaults to “General Focus”.</div>
-                )}
-              </div>
-            </div>
+              <div className="mt-5 grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-2">Category</label>
+                  <select value={taskCategory} onChange={(e) => setTaskCategory(e.target.value)} className="select-field">
+                    <option value="GATE">GATE</option>
+                    <option value="LeetCode">LeetCode</option>
+                    <option value="Project">Project</option>
+                    <option value="Reading">Reading</option>
+                    <option value="Others">Others (Custom)</option>
+                  </select>
+                </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-dark-300 mb-2">Tags (comma-separated)</label>
-              <input
-                value={tagsRaw}
-                onChange={(e) => setTagsRaw(e.target.value)}
-                className="input-field"
-                placeholder="e.g. graphs, dp, revision"
-              />
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-2">Title</label>
+                  {taskCategory === "Others" ? (
+                    <input
+                      value={taskTitle}
+                      onChange={(e) => setTaskTitle(e.target.value)}
+                      className="input-field"
+                      placeholder="e.g. System design notes"
+                    />
+                  ) : (
+                    <div className="rounded-2xl border border-dark-700 bg-dark-800/40 px-4 py-3 text-white font-semibold">
+                      {resolvedTitle()}
+                    </div>
+                  )}
+                  {taskCategory === "Others" && (
+                    <div className="text-xs text-dark-500 mt-2">Blank defaults to “General Focus”.</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-dark-300 mb-2">Tags (comma-separated)</label>
+                <input
+                  value={tagsRaw}
+                  onChange={(e) => setTagsRaw(e.target.value)}
+                  className="input-field"
+                  placeholder="e.g. graphs, dp, revision"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-white">Today</h3>
-                <p className="text-dark-400 text-sm mt-1">You’ve completed {todayPoms.length} sessions ({todayMinutes} min) today.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={refreshRecent} className="btn-ghost">
-                  Refresh
-                </button>
-                <button type="button" onClick={exportCsv} className="btn-ghost">
-                  Export CSV
-                </button>
-                <button type="button" onClick={() => setDangerOpen(true)} className="btn-ghost text-danger-300 hover:text-danger-200">
-                  Clear history
-                </button>
+          {/* Today */}
+          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+            <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Today</h3>
+                  <p className="text-dark-400 text-sm mt-1">
+                    You’ve completed {todayPoms.length} sessions ({todayMinutes} min) today.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 w-full sm:w-auto sm:flex sm:items-center sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={refreshRecent}
+                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center"
+                  >
+                    Refresh
+                  </button>
+                  <button
+                    type="button"
+                    onClick={exportCsv}
+                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center"
+                  >
+                    Export CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDangerOpen(true)}
+                    className="btn-ghost w-full sm:w-auto inline-flex items-center justify-center text-danger-300 hover:text-danger-200"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="space-y-6">
-          <div className="card">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-semibold text-white">60-Day Calendar</h3>
-                <p className="text-dark-400 text-sm mt-1">Intensity reflects total focus minutes per day.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button type="button" className="btn-ghost" disabled={!canGoPrevMonth} onClick={goPrevMonth}>
-                  <ChevronLeftIcon />
-                </button>
-                <div className="text-white font-semibold">
-                  {monthCursor.toLocaleString(undefined, { month: "long", year: "numeric" })}
+          {/* Calendar */}
+          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+            <div className="pt-2 pb-8 border-b border-dark-800/60 sm:pt-0 sm:pb-0 sm:border-0">
+              <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-center sm:text-left">
+                  <h3 className="text-lg font-semibold text-white">60-Day Calendar</h3>
+                  <p className="text-dark-400 text-sm mt-1">Intensity reflects total focus minutes per day.</p>
                 </div>
-                <button type="button" className="btn-ghost" disabled={!canGoNextMonth} onClick={goNextMonth}>
-                  <ChevronRightIcon />
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-5 grid grid-cols-7 gap-2 text-xs text-dark-500">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                <div key={d} className="text-center">{d}</div>
-              ))}
-            </div>
-
-            <div className="mt-2 grid grid-cols-7 gap-2">
-              {monthDays.map((d, idx) => {
-                if (!d) return <div key={idx} className="h-10" />
-                const dayStr = yyyyMmDd(d)
-                const minutes = dailyFocusMap[dayStr] || 0
-                const selected = dayStr === selectedDate
-
-                const t = d.getTime()
-                const minT = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate()).getTime()
-                const maxT = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate()).getTime()
-                const inRange = t >= minT && t <= maxT
-                return (
-                  <button
-                    key={dayStr}
-                    type="button"
-                    disabled={!inRange}
-                    onClick={() => setSelectedDate(dayStr)}
-                    className={`h-10 rounded-xl border flex items-center justify-center transition-all ${intensityClass(minutes)} ${
-                      selected ? "ring-2 ring-primary-500/40" : "hover:border-dark-600"
-                    } ${!inRange ? "opacity-35 cursor-not-allowed" : ""}`}
-                    title={`${dayStr} • ${minutes} min`}
-                  >
-                    <span className={minutes > 0 ? "text-white font-semibold" : "text-dark-400"}>{d.getDate()}</span>
+                <div className="flex items-center justify-center gap-2">
+                  <button type="button" className="btn-ghost" disabled={!canGoPrevMonth} onClick={goPrevMonth}>
+                    <ChevronLeftIcon />
                   </button>
-                )
-              })}
+                  <div className="text-white font-semibold whitespace-nowrap">
+                    {monthCursor.toLocaleString(undefined, { month: "long", year: "numeric" })}
+                  </div>
+                  <button type="button" className="btn-ghost" disabled={!canGoNextMonth} onClick={goNextMonth}>
+                    <ChevronRightIcon />
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-5 grid grid-cols-7 gap-2 text-xs text-dark-500">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                  <div key={d} className="text-center">
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-2 grid grid-cols-7 gap-2">
+                {monthDays.map((d, idx) => {
+                  if (!d) return <div key={idx} className="h-10" />
+                  const dayStr = yyyyMmDd(d)
+                  const minutes = dailyFocusMap[dayStr] || 0
+                  const selected = dayStr === selectedDate
+
+                  const t = d.getTime()
+                  const minT = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate()).getTime()
+                  const maxT = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate()).getTime()
+                  const inRange = t >= minT && t <= maxT
+
+                  return (
+                    <button
+                      key={dayStr}
+                      type="button"
+                      disabled={!inRange}
+                      onClick={() => setSelectedDate(dayStr)}
+                      className={`h-10 rounded-xl border flex items-center justify-center transition-all ${intensityClass(minutes)} ${
+                        selected ? "ring-2 ring-primary-500/40" : "hover:border-dark-600"
+                      } ${!inRange ? "opacity-35 cursor-not-allowed" : ""}`}
+                      title={`${dayStr} • ${minutes} min`}
+                    >
+                      <span className={minutes > 0 ? "text-white font-semibold" : "text-dark-400"}>{d.getDate()}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="card">
-              <h3 className="text-lg font-semibold text-white">Focus Distribution</h3>
-              <p className="text-dark-400 text-sm mt-1">{selectedDate}</p>
-              <div className="mt-5 h-56">
-                {topicData.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-dark-500 text-sm">No sessions for this day.</div>
-                ) : (
-                  <div className="relative h-full">
-                    <ResponsiveContainer>
-                      <PieChart>
-                        <Pie data={topicData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={2}>
-                          {topicData.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="text-center">
-                        <div className="text-white font-bold text-xl">{selectedTotalMinutes}</div>
-                        <div className="text-dark-500 text-xs">minutes</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+          {/* Sessions */}
+          <div className="card bg-transparent border-0 shadow-none rounded-none p-0 hover:border-transparent hover:shadow-none sm:bg-dark-800/55 sm:border sm:border-dark-700/70 sm:rounded-2xl sm:p-6 sm:shadow-card sm:hover:border-dark-600 sm:hover:shadow-card-hover">
+            <div className="py-8 border-b border-dark-800/60 sm:py-0 sm:border-0">
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Sessions</h3>
+                  <p className="text-dark-400 text-sm mt-1">{selectedDate}</p>
+                </div>
+                <div className="text-sm text-dark-400 tabular-nums">{displayPomodoros.length} logs</div>
               </div>
-            </div>
 
-            <div className="card">
-              <h3 className="text-lg font-semibold text-white">Sessions</h3>
-              <p className="text-dark-400 text-sm mt-1">{selectedDate}</p>
-              <div className="mt-4 space-y-3 max-h-64 overflow-auto pr-1">
+              <div className="mt-4 space-y-3 max-h-64 sm:max-h-80 lg:max-h-[520px] overflow-auto pr-1">
                 {displayPomodoros.length === 0 ? (
-                  <div className="text-dark-500 text-sm py-8 text-center">No logs.</div>
+                  <div className="text-dark-500 text-sm py-10 text-center">No logs.</div>
                 ) : (
                   displayPomodoros.map((p) => {
                     const end = new Date(p.completedAt)
@@ -745,11 +745,16 @@ export default function Pomodoro() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
                             <div className="text-white font-semibold break-words">{p.taskTitle || "(Untitled)"}</div>
-                            <div className="text-dark-400 text-xs mt-1">{time} • {p.duration} min</div>
+                            <div className="text-dark-400 text-xs mt-1">
+                              {time} • {p.duration} min
+                            </div>
                             {Array.isArray(p.tags) && p.tags.length > 0 && (
                               <div className="mt-2 flex flex-wrap gap-2">
                                 {p.tags.map((t) => (
-                                  <span key={t} className="text-xs px-2.5 py-1 rounded-full border border-dark-600 bg-dark-900/20 text-dark-300">
+                                  <span
+                                    key={t}
+                                    className="text-xs px-2.5 py-1 rounded-full border border-dark-600 bg-dark-900/20 text-dark-300"
+                                  >
                                     {t}
                                   </span>
                                 ))}
@@ -767,27 +772,27 @@ export default function Pomodoro() {
         </div>
       </div>
 
-      {dangerOpen && (
-        <div className="modal-overlay flex items-center justify-center p-4" onClick={() => setDangerOpen(false)}>
-          <div className="modal-content max-w-md w-full max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-white">Clear Pomodoro history?</h3>
-            <p className="mt-2 text-dark-300">This permanently deletes your local focus logs on this device.</p>
+        {dangerOpen && (
+          <div className="modal-overlay" onClick={() => setDangerOpen(false)}>
+            <div className="modal-content max-w-md" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold text-white">Clear Pomodoro history?</h3>
+              <p className="mt-2 text-dark-300">This permanently deletes your local focus logs on this device.</p>
 
-            <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-end gap-3">
-              <button type="button" className="btn-secondary" onClick={() => setDangerOpen(false)}>
-                Cancel
-              </button>
-              <button type="button" className="btn-danger" onClick={clearHistory}>
-                Clear history
-              </button>
+              <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-end gap-3">
+                <button type="button" className="btn-secondary" onClick={() => setDangerOpen(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="btn-danger" onClick={clearHistory}>
+                  Clear history
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {settingsOpen && (
-        <div className="modal-overlay flex items-center justify-center p-4" onClick={() => setSettingsOpen(false)}>
-          <div className="modal-content max-w-lg w-full max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setSettingsOpen(false)}>
+          <div className="modal-content max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold text-white">Timer Settings</h3>

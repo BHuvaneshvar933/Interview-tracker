@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react"
 import { fetchProfessionalAnalytics } from "../api/analytics"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { toUserMessage } from "../utils/errorMessage"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 import {
   BarChart,
@@ -93,6 +95,20 @@ function Analytics() {
   const [error, setError] = useState("")
   const [pro, setPro] = useState(null)
   const online = useOnlineStatus()
+
+  useTopBarActions(
+    <Button
+      variant="secondary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      disabled={!online}
+      onClick={() => setFilters((f) => ({ ...f, from: "", to: "", groupBy: "month" }))}
+      aria-label="Reset filters"
+    >
+      Reset
+    </Button>,
+    [online]
+  )
 
   const [filters, setFilters] = useState({
     from: "",
@@ -205,7 +221,7 @@ function Analytics() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="hidden sm:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-white">Analytics</h1>
           <p className="text-dark-400 mt-1">Track your job search performance</p>

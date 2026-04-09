@@ -6,6 +6,8 @@ import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
 import RemindersPanel from "../components/RemindersPanel"
 import { toUserMessage } from "../utils/errorMessage"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 const PlusIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,6 +100,21 @@ function priorityTone(priority) {
 export default function Todos() {
   const online = useOnlineStatus()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  useTopBarActions(
+    <Button
+      variant="primary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      disabled={!online}
+      onClick={() => setShowNew(true)}
+      aria-label="New to-do"
+    >
+      <PlusIcon />
+      New
+    </Button>,
+    [online]
+  )
 
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -313,7 +330,7 @@ export default function Todos() {
         onConfirm={doDelete}
       />
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="hidden sm:flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-white">To-dos</h1>
           <p className="text-dark-400 mt-1">Capture tasks, plan your follow-ups, and keep momentum.</p>

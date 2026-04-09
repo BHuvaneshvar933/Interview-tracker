@@ -10,6 +10,8 @@ import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
 import { toUserMessage } from "../utils/errorMessage"
 import RemindersPanel from "../components/RemindersPanel"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 // Icons
 const ArrowLeftIcon = () => (
@@ -96,6 +98,32 @@ function ApplicationDetail() {
   const navigate = useNavigate()
   const online = useOnlineStatus()
   const token = getToken()
+
+  useTopBarActions(
+    <div className="flex items-center gap-2">
+      <Button
+        variant="secondary"
+        size="sm"
+        className="px-4 rounded-2xl"
+        disabled={!online}
+        onClick={() => setIsEditing(true)}
+        aria-label="Edit"
+      >
+        <EditIcon />
+      </Button>
+      <Button
+        variant="danger"
+        size="sm"
+        className="px-4 rounded-2xl"
+        disabled={!online}
+        onClick={() => setConfirmDeleteOpen(true)}
+        aria-label="Delete"
+      >
+        <TrashIcon />
+      </Button>
+    </div>,
+    [online]
+  )
 
   const [application, setApplication] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -247,8 +275,8 @@ function ApplicationDetail() {
           Offline read-only mode. Editing and deleting require internet + sign-in.
         </div>
       )}
-      {/* Header */}
-     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 w-full overflow-hidden">
+       {/* Desktop header (mobile uses TopBar actions) */}
+      <div className="hidden sm:flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 w-full overflow-hidden">
         <div className="flex items-start gap-3 sm:gap-4 min-w-0">
           <button
             onClick={() => navigate("/job-tracker")}

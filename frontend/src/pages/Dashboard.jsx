@@ -8,6 +8,8 @@ import Heatmap90d from "../components/Heatmap90d"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getToken } from "../utils/auth"
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 const ArrowRightIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,6 +47,19 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const online = useOnlineStatus()
   const token = getToken()
+
+  useTopBarActions(
+    <Button
+      variant="primary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      onClick={() => navigate("/job-tracker")}
+      aria-label="Open Job Tracker"
+    >
+      Jobs
+    </Button>,
+    [navigate]
+  )
 
   const [appsSummary, setAppsSummary] = useState({ total: 0, byStatus: {} })
   const [todoSummary, setTodoSummary] = useState({ pending: 0, done: 0 })
@@ -189,7 +204,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="card overflow-hidden relative">
+      <div className="card overflow-hidden relative sm:block hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-dark-800/30 to-success-500/5" />
         <div className="relative">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -221,7 +236,7 @@ export default function Dashboard() {
               <div className="text-sm text-dark-400">Applications</div>
               <div className="mt-2 text-4xl font-bold text-white tracking-tight">{appsSummary.total}</div>
             </div>
-            <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/job-tracker")}>Open <ArrowRightIcon /></button>
+            <button type="button" className="btn-ghost text-sm inline-flex items-center gap-2" onClick={() => navigate("/job-tracker")}>Open <ArrowRightIcon /></button>
           </div>
 
           {topStatuses.length > 0 ? (
@@ -256,7 +271,7 @@ export default function Dashboard() {
               <div className="mt-2 text-4xl font-bold text-white tracking-tight">{todoSummary.pending}</div>
               <div className="mt-1 text-sm text-dark-400">{todoSummary.done} completed</div>
             </div>
-            <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/todos")}>Open <ArrowRightIcon /></button>
+            <button type="button" className="btn-ghost text-sm inline-flex items-center gap-2" onClick={() => navigate("/todos")}>Open <ArrowRightIcon /></button>
           </div>
 
           {!online && (
@@ -276,7 +291,7 @@ export default function Dashboard() {
               </div>
               <div className="mt-1 text-sm text-dark-400">{pomoToday.sessions} sessions today</div>
             </div>
-            <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/pomodoro")}>Open <ArrowRightIcon /></button>
+            <button type="button" className="btn-ghost text-sm inline-flex items-center gap-2" onClick={() => navigate("/pomodoro")}>Open <ArrowRightIcon /></button>
           </div>
 
           {pomoToday.minutes > 0 && (
@@ -312,7 +327,7 @@ export default function Dashboard() {
               <h2 className="text-lg font-semibold text-white">Profiles</h2>
               <p className="text-sm text-dark-400 mt-1">Your connected stats (cached on this device).</p>
             </div>
-            <button type="button" className="btn-ghost text-sm" onClick={() => navigate("/settings")}>
+            <button type="button" className="btn-ghost text-sm inline-flex items-center gap-2" onClick={() => navigate("/settings")}>
               Manage <ArrowRightIcon />
             </button>
           </div>

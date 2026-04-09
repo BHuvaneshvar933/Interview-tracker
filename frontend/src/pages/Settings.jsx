@@ -14,6 +14,8 @@ import PushToggle from "../components/PushToggle"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
 import { toUserMessage } from "../utils/errorMessage"
+import Button from "../mobile/ui/Button"
+import { useTopBarActions } from "../mobile/chrome"
 
 const UserIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,6 +92,20 @@ export default function Settings() {
       setMeLoading(false)
     }
   }
+
+  useTopBarActions(
+    <Button
+      variant="secondary"
+      size="sm"
+      className="px-4 rounded-2xl"
+      onClick={refreshMe}
+      disabled={!online}
+      aria-label="Refresh account"
+    >
+      Refresh
+    </Button>,
+    [online]
+  )
 
   useEffect(() => {
     refreshMe()

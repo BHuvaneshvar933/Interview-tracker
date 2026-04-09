@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom"
+import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { logout } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getToken } from "../utils/auth"
@@ -88,6 +88,7 @@ import { useEffect, useState } from "react"
 
 function Layout({ children }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const online = useOnlineStatus()
   const token = getToken()
@@ -106,6 +107,24 @@ function Layout({ children }) {
       document.body.style.overflow = prevBodyOverflow
       document.documentElement.style.overflow = prevHtmlOverflow
     }
+  }, [sidebarOpen])
+
+  // If a nav overlay is open, close it on route change.
+  useEffect(() => {
+    // Intentionally closing UI state on navigation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSidebarOpen(false)
+  }, [location.pathname])
+
+  // Escape closes the mobile sidebar.
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!sidebarOpen) return
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setSidebarOpen(false)
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
   }, [sidebarOpen])
 
   const handleLogout = () => {
