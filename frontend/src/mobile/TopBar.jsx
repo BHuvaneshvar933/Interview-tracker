@@ -3,8 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { ChevronLeft, MoreVertical, Settings } from "lucide-react"
 import Button from "./ui/Button"
 
-const CAPSULE_CORP_LOGO_URL =
-  "https://media.licdn.com/dms/image/v2/C4D0BAQHOlReovX7EIA/company-logo_200_200/company-logo_200_200/0/1655274337677/capsule_corp_labs_logo?e=2147483647&v=beta&t=adVTJdNYZOYrARHqX9WQGaVgl2ZunY_75FS0bhmPbw4"
+const CAPSULE_CORP_LOGO_URL = "/capsule-corp.svg"
 
 function titleForPath(pathname) {
   if (pathname === "/" || pathname.startsWith("/register")) return "Welcome"
@@ -14,7 +13,7 @@ function titleForPath(pathname) {
   if (pathname.startsWith("/pomodoro")) return "Pomodoro"
   if (pathname.startsWith("/analytics")) return "Analytics"
   if (pathname.startsWith("/ai")) return "AI Tools"
-  if (pathname.startsWith("/settings")) return "Profile"
+  if (pathname.startsWith("/settings")) return "Settings"
   return "Home"
 }
 
@@ -63,7 +62,6 @@ export default function TopBar({ onOpenMore, actions }) {
                     alt="Capsule Corp"
                     className="w-8 h-8 object-contain"
                     loading="eager"
-                    referrerPolicy="no-referrer"
                   />
                 </button>
               )}
@@ -83,7 +81,7 @@ export default function TopBar({ onOpenMore, actions }) {
                     size="sm"
                     className="px-3 rounded-2xl"
                     onClick={() => navigate("/settings")}
-                    aria-label="Profile"
+                    aria-label="Settings"
                   >
                     <Settings className="w-4 h-4" />
                   </Button>

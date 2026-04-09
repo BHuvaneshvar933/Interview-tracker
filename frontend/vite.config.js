@@ -14,7 +14,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
       manifestFilename: 'manifest.webmanifest',
-      includeAssets: ['pwa-icon.svg', 'vite.svg'],
+      includeAssets: ['capsule.svg', 'capsule-corp.svg', 'pwa-icon.svg'],
       manifest: {
         name: 'Capsule',
         short_name: 'Capsule',

@@ -5,10 +5,13 @@ import { getToken, setToken } from "../utils/auth"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { toUserMessage } from "../utils/errorMessage"
 
-const BriefcaseIcon = () => (
-  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-  </svg>
+const LogoMark = ({ className = "w-10 h-10" }) => (
+  <img
+    src="/capsule-corp.svg"
+    alt="Capsule"
+    className={`${className} object-contain`}
+    loading="eager"
+  />
 )
 
 const EmailIcon = () => (
@@ -82,13 +85,11 @@ function Login() {
         </div>
         
         <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-white/10 backdrop-blur-sm rounded-2xl">
-              <BriefcaseIcon />
+            <div className="flex items-center gap-3">
+              <LogoMark className="w-12 h-12" />
+              <span className="text-2xl font-bold text-white">Capsule</span>
             </div>
-            <span className="text-2xl font-bold text-white">Capsule</span>
           </div>
-        </div>
 
         <div className="relative z-10 space-y-6">
           <h1 className="text-5xl font-bold text-white leading-tight">
@@ -123,12 +124,10 @@ function Login() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-transparent">
         <div className="w-full max-w-md animate-fade-in">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl shadow-lg shadow-primary-500/30">
-              <BriefcaseIcon />
-            </div>
-            <span className="text-2xl font-bold text-white">Capsule</span>
-          </div>
+           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
+             <LogoMark className="w-12 h-12" />
+             <span className="text-2xl font-bold text-white">Capsule</span>
+           </div>
 
            <div className="text-center mb-10">
              <h2 className="text-3xl font-bold text-white mb-2">Welcome back</h2>

@@ -16,6 +16,7 @@ import ConfirmDialog from "../components/ConfirmDialog"
 import { toUserMessage } from "../utils/errorMessage"
 import Button from "../mobile/ui/Button"
 import { useTopBarActions } from "../mobile/chrome"
+import { useMediaQuery } from "../hooks/useMediaQuery"
 
 const UserIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,6 +47,7 @@ function isPwaLike() {
 
 export default function Settings() {
   const online = useOnlineStatus()
+  const isMobile = useMediaQuery("(max-width: 768px)")
   // Note: token isn't needed here; sign-in/out handled globally.
 
   const [tab, setTab] = useState("account")
@@ -94,17 +96,19 @@ export default function Settings() {
   }
 
   useTopBarActions(
-    <Button
-      variant="secondary"
-      size="sm"
-      className="px-4 rounded-2xl"
-      onClick={refreshMe}
-      disabled={!online}
-      aria-label="Refresh account"
-    >
-      Refresh
-    </Button>,
-    [online]
+    isMobile ? null : (
+      <Button
+        variant="secondary"
+        size="sm"
+        className="px-4 rounded-2xl"
+        onClick={refreshMe}
+        disabled={!online}
+        aria-label="Refresh account"
+      >
+        Refresh
+      </Button>
+    ),
+    [online, isMobile]
   )
 
   useEffect(() => {
@@ -277,7 +281,7 @@ export default function Settings() {
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-white">Settings</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <button type="button" onClick={refreshMe} className="btn-secondary">
               Refresh
             </button>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Home, BriefcaseBusiness, CheckSquare, Timer, User } from "lucide-react"
+import { Home, BriefcaseBusiness, CheckSquare, Timer, Settings } from "lucide-react"
 import { useLocation } from "react-router-dom"
 import TopBar from "./TopBar"
 import BottomNav from "./BottomNav"
@@ -25,7 +25,7 @@ export default function AppLayout({ children }) {
       { to: "/job-tracker", label: "Jobs", icon: BriefcaseBusiness },
       { to: "/todos", label: "To-dos", icon: CheckSquare },
       { to: "/pomodoro", label: "Focus", icon: Timer },
-      { to: "/settings", label: "Profile", icon: User },
+      { to: "/settings", label: "Settings", icon: Settings },
     ],
     []
   )
