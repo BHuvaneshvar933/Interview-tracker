@@ -28,6 +28,12 @@ let wakePromise = null
 let lastWakeOkAt = 0
 const WAKE_OK_TTL_MS = 5 * 60 * 1000
 
+let lastWakeFailAt = 0
+let lastWakeFailInfo = null
+// Prevent repeated wake attempts when the device has no connectivity but
+// navigator.onLine still reports true (common on flaky Wi-Fi / captive portals).
+const WAKE_FAIL_TTL_MS = 60 * 1000
+
 function dispatchWakeEvent(detail) {
   if (typeof window === "undefined") return
   try {
@@ -48,6 +54,19 @@ function errorInfo(e) {
   }
 }
 
+function isNetworkOfflineLike(e) {
+  // Axios/fetch-style offline error: no HTTP status + generic network failure.
+  if (e?.response?.status) return false
+  const code = String(e?.code || "")
+  const msg = String(e?.message || "").toLowerCase()
+  if (code === "ERR_NETWORK") return true
+  if (msg.includes("network error")) return true
+  if (msg.includes("failed to fetch")) return true
+  if (msg.includes("load failed")) return true
+  if (msg.includes("the network connection was lost")) return true
+  return false
+}
+
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms))
 }
@@ -59,6 +78,10 @@ export async function warmUpBackend({ force = false, reason = "" } = {}) {
 
   if (!force && Date.now() - lastWakeOkAt < WAKE_OK_TTL_MS) {
     return { ok: true, cached: true }
+  }
+
+  if (!force && lastWakeFailAt && Date.now() - lastWakeFailAt < WAKE_FAIL_TTL_MS) {
+    return { ok: false, cached: true, ...(lastWakeFailInfo || {}) }
   }
 
   if (wakePromise) return wakePromise
@@ -94,6 +117,24 @@ export async function warmUpBackend({ force = false, reason = "" } = {}) {
         lastErr = e
       }
 
+      // If it's a pure network failure (no response), warming the backend won't help.
+      // Stop retrying so offline cached content can load without repeated wake spam.
+      if (isNetworkOfflineLike(lastErr)) {
+        const info = errorInfo(lastErr)
+        lastWakeFailAt = Date.now()
+        lastWakeFailInfo = { offline: true, error: info.message, httpStatus: info.status }
+        dispatchWakeEvent({
+          status: "failed",
+          reason,
+          attempt: i + 1,
+          startedAt,
+          offline: true,
+          error: info.message,
+          httpStatus: info.status,
+        })
+        return { ok: false, offline: true, error: lastErr }
+      }
+
       // stop retrying if browser reports offline mid-wake
       if (typeof navigator !== "undefined" && navigator.onLine === false) {
         const info = errorInfo(lastErr)
@@ -111,6 +152,8 @@ export async function warmUpBackend({ force = false, reason = "" } = {}) {
     }
 
     const info = errorInfo(lastErr)
+    lastWakeFailAt = Date.now()
+    lastWakeFailInfo = { offline: false, error: info.message, httpStatus: info.status }
     dispatchWakeEvent({ status: "failed", reason, attempt: delays.length, startedAt, error: info.message, httpStatus: info.status })
     return { ok: false, error: lastErr }
   })()
@@ -131,7 +174,6 @@ function shouldAttemptWake(error) {
     if (error?.code === "ECONNABORTED") return true
     const msg = String(error?.message || "").toLowerCase()
     if (msg.includes("timeout")) return true
-    if (msg.includes("network error")) return true
   }
 
   return false

@@ -17,14 +17,17 @@ import { warmUpBackend } from "./api/axios"
 import { useMediaQuery } from "./hooks/useMediaQuery"
 import AppLayout from "./mobile/AppLayout"
 import AuthLayout from "./mobile/AuthLayout"
+import { useOnlineStatus } from "./hooks/useOnlineStatus"
 
 function App() {
   const isMobile = useMediaQuery("(max-width: 768px)")
+  const online = useOnlineStatus()
 
   useEffect(() => {
     // Render free tier cold starts: attempt a gentle warm-up on load.
+    if (!online) return
     warmUpBackend({ reason: "startup" })
-  }, [])
+  }, [online])
 
   const Shell = isMobile ? AppLayout : Layout
 
