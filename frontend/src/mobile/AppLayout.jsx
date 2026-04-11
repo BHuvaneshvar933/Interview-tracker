@@ -67,7 +67,7 @@ export default function AppLayout({ children }) {
   return (
     <MobileChromeContext.Provider value={chromeValue}>
       <div className="min-h-dvh bg-transparent overflow-x-hidden">
-        <TopBar actions={topBarActions} onOpenMore={() => setMoreOpen(true)} />
+        <TopBar actions={topBarActions} onOpenMenu={() => setMoreOpen(true)} />
 
           <div className="flex justify-center">
             <main className="w-full max-w-[420px] mx-auto px-4 pt-4 pb-24">

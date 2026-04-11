@@ -1,7 +1,6 @@
 import { useMemo } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { ChevronLeft, MoreVertical } from "lucide-react"
-import Button from "./ui/Button"
+import { ChevronLeft } from "lucide-react"
 
 const CAPSULE_CORP_LOGO_URL = "/capsule-corp.svg"
 
@@ -18,7 +17,7 @@ function titleForPath(pathname) {
   return "Home"
 }
 
-export default function TopBar({ onOpenMore, actions }) {
+export default function TopBar({ onOpenMenu, actions }) {
   const location = useLocation()
   const navigate = useNavigate()
   const title = useMemo(() => titleForPath(location.pathname), [location.pathname])
@@ -51,21 +50,31 @@ export default function TopBar({ onOpenMore, actions }) {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => navigate(isPublic ? "/" : "/dashboard")}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:bg-surfaceAlt/40 transition-all duration-200 active:scale-[0.98]"
-                  aria-label="Home"
-                >
-                  <img
-                    src={CAPSULE_CORP_LOGO_URL}
-                    alt="Capsule Corp"
-                    className="w-8 h-8 object-contain"
-                    loading="eager"
-                  />
-                </button>
-              )}
+              ) : null}
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (isPublic) {
+                    navigate("/")
+                    return
+                  }
+                  if (typeof onOpenMenu === "function") {
+                    onOpenMenu()
+                    return
+                  }
+                  navigate("/dashboard")
+                }}
+                className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-2xl hover:bg-surfaceAlt/40 transition-all duration-200 active:scale-[0.98]"
+                aria-label={isPublic ? "Home" : "Open menu"}
+              >
+                <img
+                  src={CAPSULE_CORP_LOGO_URL}
+                  alt="Capsule Corp"
+                  className="w-8 h-8 object-contain"
+                  loading="eager"
+                />
+              </button>
 
               <div className="min-w-0">
                 <div className="text-[11px] text-textMuted">Capsule</div>
@@ -75,21 +84,9 @@ export default function TopBar({ onOpenMore, actions }) {
 
             <div className="flex items-center gap-2">
               {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
-              {!isPublic ? (
-                <>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="px-3 rounded-2xl"
-                    onClick={onOpenMore}
-                    aria-label="More"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </>
-              ) : (
+              {isPublic ? (
                 <div className="min-h-[44px] min-w-[44px]" />
-              )}
+              ) : null}
             </div>
           </div>
         </div>
