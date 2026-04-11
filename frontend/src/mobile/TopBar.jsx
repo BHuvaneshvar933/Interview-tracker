@@ -11,6 +11,7 @@ function titleForPath(pathname) {
   if (pathname.startsWith("/todos")) return "To-dos"
   if (pathname.startsWith("/pomodoro")) return "Pomodoro"
   if (pathname.startsWith("/habits")) return "Habits"
+  if (pathname.startsWith("/curator")) return "Curator"
   if (pathname.startsWith("/analytics")) return "Analytics"
   if (pathname.startsWith("/ai")) return "AI Tools"
   if (pathname.startsWith("/settings")) return "Settings"

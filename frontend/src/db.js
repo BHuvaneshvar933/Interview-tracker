@@ -24,10 +24,18 @@ const habitLogsStore = localforage.createInstance({
   description: "Habits daily completion logs",
 })
 
+const curatorStore = localforage.createInstance({
+  name: "capsule",
+  storeName: "curator",
+  description: "Saved content curator items",
+})
+
 const INDEX_KEY = "pomodoros:index"
 
 const HABITS_INDEX_KEY = "habits:index"
 const HABITS_LOG_DAYS_KEY = "habits:logDays"
+
+const CURATOR_INDEX_KEY = "curator:index"
 
 function byIdKey(id) {
   return `pomodoros:byId:${id}`
@@ -39,6 +47,10 @@ function habitByIdKey(id) {
 
 function habitDayLogKey(dayKey) {
   return `habits:log:${dayKey}`
+}
+
+function curatorByIdKey(id) {
+  return `curator:byId:${id}`
 }
 
 function safeJsonParse(value, fallback) {
@@ -364,4 +376,84 @@ export async function resetHabitsToDefaults() {
   await clearHabits()
   await ensureDefaultHabits()
   return listHabits()
+}
+
+export async function listCuratorItems() {
+  const idx = (await curatorStore.getItem(CURATOR_INDEX_KEY)) || []
+  const ids = Array.isArray(idx) ? idx : []
+  if (ids.length === 0) return []
+
+  const out = []
+  for (const id of ids) {
+    // eslint-disable-next-line no-await-in-loop
+    const item = await curatorStore.getItem(curatorByIdKey(id))
+    if (item) out.push(item)
+  }
+
+  out.sort((a, b) => String(b?.createdAt || "").localeCompare(String(a?.createdAt || "")))
+  return out
+}
+
+export async function createCuratorItem(entry) {
+  const now = new Date().toISOString()
+  const id = uuid()
+  const title = String(entry?.title || "").trim()
+  if (!title) throw new Error("Title is required")
+
+  const item = {
+    id,
+    url: entry?.url ? String(entry.url).trim() : "",
+    type: String(entry?.type || "NOTE"),
+    title,
+    description: entry?.description ? String(entry.description).trim() : "",
+    tags: Array.isArray(entry?.tags) ? entry.tags : [],
+    favorite: Boolean(entry?.favorite),
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  await curatorStore.setItem(curatorByIdKey(id), item)
+  const rawIdx = (await curatorStore.getItem(CURATOR_INDEX_KEY)) || []
+  const ids = Array.isArray(rawIdx) ? rawIdx : []
+  await curatorStore.setItem(CURATOR_INDEX_KEY, [...ids, id])
+  return item
+}
+
+export async function updateCuratorItem(id, patch) {
+  const prev = await curatorStore.getItem(curatorByIdKey(id))
+  if (!prev) throw new Error("Item not found")
+
+  const next = {
+    ...prev,
+    url: patch?.url != null ? String(patch.url).trim() : prev.url,
+    type: patch?.type != null ? String(patch.type) : prev.type,
+    title: patch?.title != null ? String(patch.title).trim() : prev.title,
+    description: patch?.description != null ? String(patch.description).trim() : prev.description,
+    tags: patch?.tags != null ? (Array.isArray(patch.tags) ? patch.tags : []) : prev.tags,
+    favorite: patch?.favorite != null ? Boolean(patch.favorite) : Boolean(prev.favorite),
+    updatedAt: new Date().toISOString(),
+  }
+
+  if (!next.title) throw new Error("Title is required")
+  await curatorStore.setItem(curatorByIdKey(id), next)
+  return next
+}
+
+export async function deleteCuratorItem(id) {
+  await curatorStore.removeItem(curatorByIdKey(id))
+  const rawIdx = (await curatorStore.getItem(CURATOR_INDEX_KEY)) || []
+  const ids = Array.isArray(rawIdx) ? rawIdx : []
+  await curatorStore.setItem(CURATOR_INDEX_KEY, ids.filter((x) => x !== id))
+}
+
+export async function toggleCuratorFavorite(id) {
+  const prev = await curatorStore.getItem(curatorByIdKey(id))
+  if (!prev) throw new Error("Item not found")
+  const next = {
+    ...prev,
+    favorite: !prev.favorite,
+    updatedAt: new Date().toISOString(),
+  }
+  await curatorStore.setItem(curatorByIdKey(id), next)
+  return next
 }

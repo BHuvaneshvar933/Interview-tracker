@@ -40,7 +40,7 @@ function cellClass(count, tone) {
   return "bg-emerald-500/22 border-emerald-500/26"
 }
 
-export default function Heatmap90d({ days, tone = "primary" }) {
+export default function Heatmap90d({ days, tone = "primary", layout = "compact", fillScale = 1 }) {
   const map = new Map()
   for (const d of Array.isArray(days) ? days : []) {
     if (!d?.date) continue
@@ -73,25 +73,60 @@ export default function Heatmap90d({ days, tone = "primary" }) {
         <div className="text-sm text-textSecondary">Total: <span className="text-textPrimary font-semibold">{total}</span></div>
       </div>
 
-      <div className="mt-3 overflow-x-auto">
-        <div className="inline-flex gap-1">
-          {weeks.map((w, wi) => (
-            <div key={wi} className="flex flex-col gap-1">
-              {w.map((c, ci) => {
-                if (!c) return <div key={ci} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                const title = `${c.date} • ${c.count}`
-                return (
-                  <div
-                    key={ci}
-                    className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border ${cellClass(c.count, tone)}`}
-                    title={title}
-                  />
-                )
-              })}
-            </div>
-          ))}
+      {layout === "fill" ? (
+        <div className="mt-3">
+          <div
+            className="flex w-full gap-1 sm:gap-1.5"
+            style={
+              fillScale && Number(fillScale) !== 1
+                ? { transform: `scale(${Number(fillScale)})`, transformOrigin: "top center" }
+                : undefined
+            }
+          >
+            {weeks.map((w, wi) => (
+              <div key={wi} className="flex flex-col gap-1 sm:gap-1.5 flex-1 min-w-0">
+                {w.map((c, ci) => {
+                  if (!c) {
+                    return (
+                      <div key={ci} className="relative w-full before:content-[''] before:block before:pt-[100%]" />
+                    )
+                  }
+                  const title = `${c.date} • ${c.count}`
+                  return (
+                    <div
+                      key={ci}
+                      className="relative w-full before:content-[''] before:block before:pt-[100%]"
+                      title={title}
+                    >
+                      <div className={`absolute inset-0 rounded-md border ${cellClass(c.count, tone)}`} />
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-3 overflow-x-auto">
+          <div className="inline-flex gap-1">
+            {weeks.map((w, wi) => (
+              <div key={wi} className="flex flex-col gap-1">
+                {w.map((c, ci) => {
+                  if (!c) return <div key={ci} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  const title = `${c.date} • ${c.count}`
+                  return (
+                    <div
+                      key={ci}
+                      className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded border ${cellClass(c.count, tone)}`}
+                      title={title}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

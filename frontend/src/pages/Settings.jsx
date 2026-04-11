@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { getMe } from "../api/account"
 import { useOnlineStatus } from "../hooks/useOnlineStatus"
 import { getSetting, removeSetting, setSetting } from "../db"
@@ -9,7 +10,7 @@ import {
   normalizeGitHubUsername,
   normalizeLeetCodeUsername,
 } from "../utils/integrations"
-import Heatmap90d from "../components/Heatmap90d"
+import { Heatmap90Grid } from "../components/ActivityHeatmap90Widget"
 import PushToggle from "../components/PushToggle"
 import Toast from "../components/Toast"
 import ConfirmDialog from "../components/ConfirmDialog"
@@ -44,7 +45,15 @@ export default function Settings() {
   const isMobile = useMediaQuery("(max-width: 768px)")
   // Note: token isn't needed here; sign-in/out handled globally.
 
-  const [tab, setTab] = useState("account")
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const normalizedTabFromUrl = useMemo(() => {
+    const raw = String(searchParams.get("tab") || "").trim().toLowerCase()
+    if (raw === "account" || raw === "notifications" || raw === "integrations") return raw
+    return ""
+  }, [searchParams])
+
+  const [tab, setTab] = useState(() => normalizedTabFromUrl || "account")
   const [meLoading, setMeLoading] = useState(false)
   const [meError, setMeError] = useState("")
   const [me, setMe] = useState(null)
@@ -102,6 +111,21 @@ export default function Settings() {
   useEffect(() => {
     refreshMe()
   }, [online])
+
+  useEffect(() => {
+    if (!normalizedTabFromUrl) return
+    if (normalizedTabFromUrl === tab) return
+    setTab(normalizedTabFromUrl)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [normalizedTabFromUrl])
+
+  const setTabAndUrl = (nextTab) => {
+    setTab(nextTab)
+    const next = new URLSearchParams(searchParams)
+    if (nextTab === "account") next.delete("tab")
+    else next.set("tab", nextTab)
+    setSearchParams(next)
+  }
 
   useEffect(() => {
     if (tab !== "integrations") return
@@ -280,13 +304,13 @@ export default function Settings() {
 
         <div className="mt-4">
           <nav className="flex gap-1 overflow-x-auto pb-px scrollbar-hide">
-            <TabButton active={tab === "account"} onClick={() => setTab("account")} icon={<UserIcon />}>
+            <TabButton active={tab === "account"} onClick={() => setTabAndUrl("account")} icon={<UserIcon />}>
               Account
             </TabButton>
-            <TabButton active={tab === "notifications"} onClick={() => setTab("notifications")} icon={<BellIcon />}>
+            <TabButton active={tab === "notifications"} onClick={() => setTabAndUrl("notifications")} icon={<BellIcon />}>
               Notifications
             </TabButton>
-            <TabButton active={tab === "integrations"} onClick={() => setTab("integrations")} icon={<DatabaseIcon />}>
+            <TabButton active={tab === "integrations"} onClick={() => setTabAndUrl("integrations")} icon={<DatabaseIcon />}>
               Integrations
             </TabButton>
           </nav>
@@ -401,7 +425,7 @@ export default function Settings() {
                     </div>
 
                     <div className="mt-4">
-                      <Heatmap90d days={ghContrib} tone="primary" />
+                      <Heatmap90Grid days={ghContrib} tone="primary" unit="contributions" showHeader={false} />
                       <div className="mt-2 text-xs text-dark-500">Last synced: {ghSyncedAt ? new Date(ghSyncedAt).toLocaleString() : "—"}</div>
                     </div>
                   </div>
@@ -454,7 +478,7 @@ export default function Settings() {
                     </div>
 
                     <div className="mt-4">
-                      <Heatmap90d days={lcProfile.submissionDays90d} tone="success" />
+                      <Heatmap90Grid days={lcProfile.submissionDays90d} tone="success" unit="submissions" showHeader={false} />
                       <div className="mt-2 text-xs text-dark-500">Last synced: {lcSyncedAt ? new Date(lcSyncedAt).toLocaleString() : "—"}</div>
                     </div>
                   </div>

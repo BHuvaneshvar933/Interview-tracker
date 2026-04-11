@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom"
-import { BarChart3, LogOut, Sparkles, CheckCircle2, Settings, X } from "lucide-react"
+import { BarChart3, Bookmark, LogOut, Sparkles, CheckCircle2, Settings, X } from "lucide-react"
 import { logout } from "../utils/auth"
 
 export default function MoreSheet({ open, onClose }) {
@@ -45,6 +45,7 @@ export default function MoreSheet({ open, onClose }) {
 
           <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-3">
             <SheetLink to="/settings" icon={Settings} label="Settings" onClick={onClose} />
+            <SheetLink to="/curator" icon={Bookmark} label="Curator" onClick={onClose} />
             <SheetLink to="/habits" icon={CheckCircle2} label="Habits" onClick={onClose} />
             <SheetLink to="/analytics" icon={BarChart3} label="Analytics" onClick={onClose} />
             <SheetLink to="/ai" icon={Sparkles} label="AI Tools" onClick={onClose} />
