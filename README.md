@@ -1,6 +1,5 @@
-# Tracker1 (Interview Tracker)
+# Capsule
 
-Full-stack job application tracker.
 
 ## Tech
 
